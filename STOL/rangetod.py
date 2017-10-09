@@ -1,7 +1,8 @@
+" trade off between aircraft range and take off distance "
 import numpy as np
+import matplotlib.pyplot as plt
 from stol import Mission
 from gpkit.tools.autosweep import autosweep_1d
-import matplotlib.pyplot as plt
 
 M = Mission()
 M.cost = M["S_{TO}"]*M["W"]
@@ -10,13 +11,13 @@ Rmin = 25
 Rmax = 100
 R = np.linspace(Rmin, Rmax, 100)
 
-bst = autosweep_1d(M, 0.01, M["R"], [Rmin, Rmax], solver="mosek")
-S = bst.sample_at(R)("S_{TO}")
+Bst = autosweep_1d(M, 0.01, M["R"], [Rmin, Rmax], solver="mosek")
+S = Bst.sample_at(R)("S_{TO}")
 
-fig, ax = plt.subplots()
-ax.plot(R, S)
-ax.set_xlabel("Aircraft Range [nmi]")
-ax.set_ylabel("Take-off Distance [ft]")
-ax.set_ylim([0, 800])
-ax.grid()
-fig.savefig("rangetod.pdf")
+Fig, Ax = plt.subplots()
+Ax.plot(R, S)
+Ax.set_xlabel("Aircraft Range [nmi]")
+Ax.set_ylabel("Take-off Distance [ft]")
+Ax.set_ylim([0, 800])
+Ax.grid()
+Fig.savefig("rangetod.pdf")

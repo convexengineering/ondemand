@@ -5,6 +5,8 @@ from gpkit import Variable, Model, SignomialsEnabled
 from gpfit.fit_constraintset import FitCS
 from flightstate import FlightState
 
+# pylint: disable=too-many-locals, invalid-name
+
 class TakeOff(Model):
     """
     take off model
@@ -56,7 +58,7 @@ class TakeOff(Model):
             constraints.extend([
                 B >= g/aircraft["W"]*0.5*fs["\\rho"]*aircraft["S"]*CDg])
 
-        return constraints
+        return constraints, fs
 
 if __name__ == "__main__":
     M = TakeOff()

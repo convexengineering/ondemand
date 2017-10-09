@@ -1,9 +1,13 @@
+" short take off and landing aircraft model "
 from numpy import pi
-from gpkit import Variable, Model, units
+from gpkit import Variable, Model
 from takeoff import TakeOff
 from flightstate import FlightState
 
+# pylint: disable=too-many-locals, invalid-name, unused-variable
+
 class Aircraft(Model):
+    " thing that we want to build "
     def setup(self):
 
         W = Variable("W", "lbf", "aircraft weight")
@@ -31,9 +35,11 @@ class Aircraft(Model):
         return constraints
 
     def flight_model(self):
+        " what happens during flight "
         return AircraftPerf(self)
 
 class AircraftPerf(Model):
+    " simple drag model "
     def setup(self, aircraft):
 
         CL = Variable("C_L", "-", "lift coefficient")
@@ -47,6 +53,7 @@ class AircraftPerf(Model):
 
 
 class Cruise(Model):
+    " calculates aircraft range "
     def setup(self, aircraft):
 
         fs = FlightState()
@@ -66,9 +73,10 @@ class Cruise(Model):
             R <= (aircraft["h_{batt}"]*aircraft["W_{batt}"]/g
                   * aircraft["\\eta_{e}"]*fs["V"]/Pshaft)]
 
-        return constraints, aircraftperf
+        return constraints, aircraftperf, fs
 
 class Mission(Model):
+    " creates aircraft and flies it around "
     def setup(self):
 
         aircraft = Aircraft()
