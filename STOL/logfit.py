@@ -2,8 +2,8 @@ import numpy as np
 from gpfit.fit import fit
 
 N = 100
-A = np.linspace(1, 10, 100)
-B = np.array([0.5, 0.7])
+A = np.linspace(0.1, 1, 100)
+B = np.array([0.01, 0.05, 0.09])
 
 x, y = np.meshgrid(A, B)
 z = np.log(x/(x-y))
