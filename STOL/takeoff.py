@@ -28,11 +28,11 @@ class TakeOff(Model):
         CLg = Variable("C_{L_g}", "-", "ground lift coefficient")
         CDg = Variable("C_{D_g}", "-", "grag ground coefficient")
         Kg = Variable("K_g", 0.04, "-", "ground-effect induced drag parameter")
-        CLmax = Variable("C_{L_{max}}", 2.4, "-", "max lift coefficient")
+        CLmax = Variable("C_{L_{max}}", 3.4, "-", "max lift coefficient")
         Vstall = Variable("V_{stall}", "m/s", "stall velocity")
 
         zsto = Variable("z_{S_{TO}}", "-", "take off distance helper variable")
-        Sto = Variable("S_{TO}", "ft", "take off distance")
+        Sto = Variable("S_{TO}", 200, "ft", "take off distance")
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propellor efficiency")
 
         path = os.path.dirname(os.path.abspath(__file__))

@@ -3,7 +3,7 @@ from numpy import pi
 from gpkit import Variable, Model
 from takeoff import TakeOff
 from flightstate import FlightState
-
+from stol_aircraft import simpleAircraft
 # pylint: disable=too-many-locals, invalid-name, unused-variable
 
 class Aircraft(Model):
@@ -79,7 +79,8 @@ class Mission(Model):
     " creates aircraft and flies it around "
     def setup(self):
 
-        aircraft = Aircraft()
+        #aircraft = Aircraft()
+        aircraft = simpleAircraft()
 
         takeoff = TakeOff(aircraft)
         cruise = Cruise(aircraft)
@@ -90,5 +91,6 @@ class Mission(Model):
 
 if __name__ == "__main__":
     M = Mission()
-    M.cost = M["S_{TO}"]*M["W"]
+    M.cost = M["W"]
     sol = M.solve("mosek")
+    print sol.table()
