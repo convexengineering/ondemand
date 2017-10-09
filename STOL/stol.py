@@ -7,8 +7,7 @@ class Aircraft(Model):
         W = Variable("W", "lbf", "aircraft weight")
         Wpay = Variable("W_{pay}", 500, "lbf", "payload weight")
         hbatt = Variable("h_{batt}", 300, "W*hr/kg", "battery specific energy")
-        etatotal = Variable("\\eta_{total}", 0.8, "-",
-                            "total propulsive efficiency")
+        etae = Variable("\\eta_{e}", 0.9, "-", "total electrical efficiency")
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
         AR = Variable("AR", 10, "-", "wing aspect ratio")
         S = Variable("S", "ft**2", "wing planform area")
@@ -32,22 +31,35 @@ class AircraftPerf(Model):
 
         return constraints
 
+class FlightState(Model):
+    def setup(self):
+
+        rho = Variable("\\rho", 1.225, "kg/m**3", "air density")
+        V = Variable("V", "knots", "speed")
+
+        constraints = [rho == rho, V == V]
+
+        return constraints
+
 class Cruise(Model):
     def setup(self, aircraft):
 
+        fs = FlightState()
         aircraftperf = aircraft.flight_model()
 
         R = Variable("R", 50, "nmi", "aircraft range")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
-        rho = Variable("\\rho", 1.225, "kg/m**3", "air density")
-        V = Variable("V", "knots", "speed")
         T = Variable("T", "lbf", "thrust")
+        Pshaft = Variable("P_{shaft}", "W", "shaft power")
+        etaprop = Variable("\\eta_{prop}", 0.8, "-", "propellor efficiency")
 
         constraints = [
-            aircraft["W"] == 0.5*aircraftperf["C_L"]*rho*aircraft["S"]*V**2,
-            T >= 0.5*aircraftperf["C_D"]*rho*aircraft["S"]*V**2,
+            aircraft["W"] == (0.5*aircraftperf["C_L"]*fs["\\rho"]
+                              * aircraft["S"]*fs["V"]**2),
+            T >= 0.5*aircraftperf["C_D"]*fs["\\rho"]*aircraft["S"]*fs["V"]**2,
+            Pshaft >= T*fs["V"]/etaprop,
             R <= (aircraft["h_{batt}"]*aircraft["W_{batt}"]/g
-                  *aircraft["\\eta_{total}"]/T)]
+                  * aircraft["\\eta_{e}"]*fs["V"]/Pshaft)]
 
         return constraints, aircraftperf
 
