@@ -1,5 +1,7 @@
 from numpy import pi
-from gpkit import Variable, Model
+from gpkit import Variable, Model, units
+from takeoff import TakeOff
+from flightstate import FlightState
 
 class Aircraft(Model):
     def setup(self):
@@ -11,8 +13,13 @@ class Aircraft(Model):
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
         AR = Variable("AR", 10, "-", "wing aspect ratio")
         S = Variable("S", "ft**2", "wing planform area")
+        WS = Variable("(W/S)", 1.5, "lbf/ft**2",
+                      "wing weight scaling factor")
+        Wwing = Variable("W_{wing}", "lbf", "wing weight")
+        Pshaftmax = Variable("P_{shaft-max}", 10000, "W", "max shaft power")
 
-        constraints = [W >= Wbatt + Wpay]
+        constraints = [W >= Wbatt + Wpay + Wwing,
+                       Wwing >= WS*S]
 
         return constraints
 
@@ -31,15 +38,6 @@ class AircraftPerf(Model):
 
         return constraints
 
-class FlightState(Model):
-    def setup(self):
-
-        rho = Variable("\\rho", 1.225, "kg/m**3", "air density")
-        V = Variable("V", "knots", "speed")
-
-        constraints = [rho == rho, V == V]
-
-        return constraints
 
 class Cruise(Model):
     def setup(self, aircraft):
@@ -68,11 +66,14 @@ class Mission(Model):
 
         aircraft = Aircraft()
 
+        takeoff = TakeOff(aircraft)
         cruise = Cruise(aircraft)
 
-        return aircraft, cruise
+        constraints = [aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"]]
+
+        return constraints, aircraft, takeoff, cruise
 
 if __name__ == "__main__":
     M = Mission()
-    M.cost = M["W"]
+    M.cost = M["S_{TO}"]
     sol = M.solve("mosek")
