@@ -1,3 +1,4 @@
+from numpy import pi
 from gpkit import Variable, Model
 
 class Aircraft(Model):
@@ -6,26 +7,49 @@ class Aircraft(Model):
         W = Variable("W", "lbf", "aircraft weight")
         Wpay = Variable("W_{pay}", 500, "lbf", "payload weight")
         hbatt = Variable("h_{batt}", 300, "W*hr/kg", "battery specific energy")
-        LoD = Variable("(L/D)", 10, "-", "lift to drag ratio")
         etatotal = Variable("\\eta_{total}", 0.8, "-",
                             "total propulsive efficiency")
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
+        AR = Variable("AR", 10, "-", "wing aspect ratio")
+        S = Variable("S", "ft**2", "wing planform area")
 
         constraints = [W >= Wbatt + Wpay]
+
+        return constraints
+
+    def flight_model(self):
+        return AircraftPerf(self)
+
+class AircraftPerf(Model):
+    def setup(self, aircraft):
+
+        CL = Variable("C_L", "-", "lift coefficient")
+        CD = Variable("C_D", "-", "drag coefficient")
+        cda = Variable("CDA", 0.024, "-", "non-lifting drag coefficient")
+        e = Variable("e", 0.8, "-", "span efficiency")
+
+        constraints = [CD >= cda + CL**2/pi/e/aircraft["AR"]]
 
         return constraints
 
 class Cruise(Model):
     def setup(self, aircraft):
 
+        aircraftperf = aircraft.flight_model()
+
         R = Variable("R", 50, "nmi", "aircraft range")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
+        rho = Variable("\\rho", 1.225, "kg/m**3", "air density")
+        V = Variable("V", "knots", "speed")
+        T = Variable("T", "lbf", "thrust")
 
-        constraints = [R <= (
-            aircraft["h_{batt}"]*aircraft["W_{batt}"]/aircraft["W"]/g
-            * aircraft["(L/D)"]*aircraft["\\eta_{total}"])]
+        constraints = [
+            aircraft["W"] == 0.5*aircraftperf["C_L"]*rho*aircraft["S"]*V**2,
+            T >= 0.5*aircraftperf["C_D"]*rho*aircraft["S"]*V**2,
+            R <= (aircraft["h_{batt}"]*aircraft["W_{batt}"]/g
+                  *aircraft["\\eta_{total}"]/T)]
 
-        return constraints
+        return constraints, aircraftperf
 
 class Mission(Model):
     def setup(self):
