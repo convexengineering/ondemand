@@ -16,11 +16,15 @@ class Aircraft(Model):
         WS = Variable("(W/S)", 1.5, "lbf/ft**2",
                       "wing weight scaling factor")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
-        Pshaftmax = Variable("P_{shaft-max}", 10000, "W", "max shaft power")
-        PW = Variable("(P/W)", 0.6, "hp/lbf", "power to weight ratio")
+        Pshaftmax = Variable("P_{shaft-max}", "W", "max shaft power")
+        PW = Variable("(P/W)", 0.06, "hp/lbf", "power to weight ratio")
         Wmotor = Variable("W_{motor}", "lbf", "motor weight")
+        fstruct = Variable("f_{struct}", 0.2, "-",
+                           "structural weight fraction")
+        Wstruct = Variable("W_{struct}", "lbf", "structural weight")
 
-        constraints = [W >= Wbatt + Wpay + Wwing + Wmotor,
+        constraints = [W >= Wbatt + Wpay + Wwing + Wmotor + Wstruct,
+                       Wstruct >= fstruct*W,
                        Wwing >= WS*S,
                        Wmotor >= Pshaftmax/PW]
 
@@ -78,5 +82,5 @@ class Mission(Model):
 
 if __name__ == "__main__":
     M = Mission()
-    M.cost = M["S_{TO}"]
+    M.cost = M["S_{TO}"]*M["W"]
     sol = M.solve("mosek")
