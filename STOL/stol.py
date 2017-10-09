@@ -17,9 +17,12 @@ class Aircraft(Model):
                       "wing weight scaling factor")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Pshaftmax = Variable("P_{shaft-max}", 10000, "W", "max shaft power")
+        PW = Variable("(P/W)", 0.6, "hp/lbf", "power to weight ratio")
+        Wmotor = Variable("W_{motor}", "lbf", "motor weight")
 
-        constraints = [W >= Wbatt + Wpay + Wwing,
-                       Wwing >= WS*S]
+        constraints = [W >= Wbatt + Wpay + Wwing + Wmotor,
+                       Wwing >= WS*S,
+                       Wmotor >= Pshaftmax/PW]
 
         return constraints
 
