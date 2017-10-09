@@ -17,9 +17,9 @@ class Aircraft(Model):
                       "wing weight scaling factor")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Pshaftmax = Variable("P_{shaft-max}", "W", "max shaft power")
-        PW = Variable("(P/W)", 0.06, "hp/lbf", "power to weight ratio")
+        PW = Variable("(P/W)", 0.2, "hp/lbf", "power to weight ratio")
         Wmotor = Variable("W_{motor}", "lbf", "motor weight")
-        fstruct = Variable("f_{struct}", 0.2, "-",
+        fstruct = Variable("f_{struct}", 0.5, "-",
                            "structural weight fraction")
         Wstruct = Variable("W_{struct}", "lbf", "structural weight")
 
