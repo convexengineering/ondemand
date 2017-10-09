@@ -1,15 +1,16 @@
-from gpkit import Variable, Model, SignomialsEnabled
+" take off model "
 import os
 import pandas as pd
+from gpkit import Variable, Model, SignomialsEnabled
 from gpfit.fit_constraintset import FitCS
 
 class TakeOff(Model):
-    def setup(self, sp=False):
-        """
-        take off model
-        http://www.dept.aoe.vt.edu/~lutze/AOE3104/takeoff&landing.pdf
+    """
+    take off model
+    http://www.dept.aoe.vt.edu/~lutze/AOE3104/takeoff&landing.pdf
 
-        """
+    """
+    def setup(self, sp=False):
 
         A = Variable("A", "m/s**2", "log fit equation helper 1")
         B = Variable("B", "1/m", "log fit equation helper 2")
