@@ -10,7 +10,7 @@ class Aircraft(Model):
     def setup(self):
 
         W = Variable("W", "lbf", "aircraft weight")
-        Wpay = Variable("W_{pay}", 500, "lbf", "payload weight")
+        Wpay = Variable("W_{pay}", 800, "lbf", "payload weight")
         hbatt = Variable("h_{batt}", 210, "W*hr/kg", "battery specific energy")
         etae = Variable("\\eta_{e}", 0.9, "-", "total electrical efficiency")
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
@@ -60,7 +60,7 @@ class Cruise(Model):
         fs = FlightState()
         aircraftperf = aircraft.flight_model()
 
-        R = Variable("R", 300, "nmi", "aircraft range")
+        R = Variable("R", 200, "nmi", "aircraft range")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         T = Variable("T", "lbf", "thrust")
         Pshaft = Variable("P_{shaft}", "W", "shaft power")
