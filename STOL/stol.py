@@ -12,25 +12,28 @@ class Aircraft(Model):
 
         W = Variable("W", "lbf", "aircraft weight")
         Wpay = Variable("W_{pay}", 500, "lbf", "payload weight")
-        hbatt = Variable("h_{batt}", 300, "W*hr/kg", "battery specific energy")
+        hbatt = Variable("h_{batt}", 210, "W*hr/kg", "battery specific energy")
         etae = Variable("\\eta_{e}", 0.9, "-", "total electrical efficiency")
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
         AR = Variable("AR", 10, "-", "wing aspect ratio")
         S = Variable("S", "ft**2", "wing planform area")
-        WS = Variable("(W/S)", 1.5, "lbf/ft**2",
+        WS = Variable("(W/S)", 2.5, "lbf/ft**2",
                       "wing weight scaling factor")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Pshaftmax = Variable("P_{shaft-max}", "W", "max shaft power")
-        PW = Variable("(P/W)", 0.2, "hp/lbf", "power to weight ratio")
+        sp_motor = Variable("sp_{motor}", 7./9.81, "kW/N",
+                            'Motor specific power')
         Wmotor = Variable("W_{motor}", "lbf", "motor weight")
-        fstruct = Variable("f_{struct}", 0.5, "-",
+        fstruct = Variable("f_{struct}", 0.2, "-",
                            "structural weight fraction")
         Wstruct = Variable("W_{struct}", "lbf", "structural weight")
+        b = Variable("b", "ft", "Wing span")
 
         constraints = [W >= Wbatt + Wpay + Wwing + Wmotor + Wstruct,
                        Wstruct >= fstruct*W,
                        Wwing >= WS*S,
-                       Wmotor >= Pshaftmax/PW]
+                       Wmotor >= Pshaftmax/sp_motor,
+                       AR == b**2/S]
 
         return constraints
 
@@ -79,8 +82,7 @@ class Mission(Model):
     " creates aircraft and flies it around "
     def setup(self):
 
-        #aircraft = Aircraft()
-        aircraft = simpleAircraft()
+        aircraft = Aircraft()
 
         takeoff = TakeOff(aircraft)
         cruise = Cruise(aircraft)
