@@ -8,7 +8,7 @@ from scipy.interpolate import interp1d
 M = Mission()
 M.cost = M["W"]
 
-sto = np.linspace(100, 700, 5)
+sto = np.linspace(100, 700, 25)
 Rmin = 25
 
 Fig, Ax = plt.subplots()
@@ -42,6 +42,7 @@ if len(sto) > 6:
     Ax.plot(sto, Rknee)
     Ax.set_xlabel("Take off Distance [ft]")
     Ax.set_ylabel("Range [nmi]")
+    Ax.set_ylim([0, 350])
     Ax.grid()
     Fig.savefig("rangetod.pdf")
 

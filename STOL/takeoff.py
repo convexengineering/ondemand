@@ -32,7 +32,7 @@ class TakeOff(Model):
         Vstall = Variable("V_{stall}", "m/s", "stall velocity")
 
         zsto = Variable("z_{S_{TO}}", "-", "take off distance helper variable")
-        Sto = Variable("S_{TO}", 200, "ft", "take off distance")
+        Sto = Variable("S_{TO}", 300, "ft", "take off distance")
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propellor efficiency")
 
         path = os.path.dirname(os.path.abspath(__file__))

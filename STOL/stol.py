@@ -53,7 +53,6 @@ class AircraftPerf(Model):
 
         return constraints
 
-
 class Cruise(Model):
     " calculates aircraft range "
     def setup(self, aircraft):
@@ -61,7 +60,7 @@ class Cruise(Model):
         fs = FlightState()
         aircraftperf = aircraft.flight_model()
 
-        R = Variable("R", 50, "nmi", "aircraft range")
+        R = Variable("R", 300, "nmi", "aircraft range")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         T = Variable("T", "lbf", "thrust")
         Pshaft = Variable("P_{shaft}", "W", "shaft power")
