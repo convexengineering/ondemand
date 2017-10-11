@@ -21,19 +21,19 @@ class simpleAircraft(Model):
                       "wing weight scaling factor")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Pshaftmax = Variable("P_{shaft-max}", "W", "max shaft power")
-        #PW = Variable("(P/W)", 0.2, "hp/lbf", "power to weight ratio")
-        sp_motor 	= Variable("sp_motor", 7./9.81, "kW/N", 'Motor specific power')
+        sp_motor = Variable("sp_{motor}", 7./9.81, "kW/N",
+                            'Motor specific power')
         Wmotor = Variable("W_{motor}", "lbf", "motor weight")
-        fstruct = Variable("f_{struct}", 0.5, "-",
+        fstruct = Variable("f_{struct}", 0.2, "-",
                            "structural weight fraction")
-        Wstruct 		= Variable("W_{struct}", "lbf", "structural weight")
-        b 				= Variable("b", "ft", "Wing span")
+        Wstruct = Variable("W_{struct}", "lbf", "structural weight")
+        b = Variable("b", "ft", "Wing span")
+
         constraints = [W >= Wbatt + Wpay + Wwing + Wmotor + Wstruct,
                        Wstruct >= fstruct*W,
                        Wwing >= WS*S,
                        Wmotor >= Pshaftmax/sp_motor,
-                       AR == b**2/S,
-                       ]
+                       AR == b**2/S]
 
         return constraints
 
