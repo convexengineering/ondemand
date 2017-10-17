@@ -1,8 +1,8 @@
 " short take off and landing aircraft model "
 import os
 import pandas as pd
-from numpy import pi
 from gpkit import Variable, Model, SignomialsEnabled
+from gpkitmodels.GP.aircraft.wing.wing import Wing
 from gpfit.fit_constraintset import FitCS
 from flightstate import FlightState
 # pylint: disable=too-many-locals, invalid-name, unused-variable
@@ -11,13 +11,14 @@ class Aircraft(Model):
     " thing that we want to build "
     def setup(self):
 
+        Wing.fillModel = None
+        self.wing = Wing()
+
         W = Variable("W", "lbf", "aircraft weight")
         Wpay = Variable("W_{pay}", 800, "lbf", "payload weight")
         hbatt = Variable("h_{batt}", 210, "W*hr/kg", "battery specific energy")
         etae = Variable("\\eta_{e}", 0.9, "-", "total electrical efficiency")
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
-        AR = Variable("AR", 10, "-", "wing aspect ratio")
-        S = Variable("S", "ft**2", "wing planform area")
         WS = Variable("(W/S)", 2.5, "lbf/ft**2",
                       "wing weight scaling factor")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
@@ -25,18 +26,24 @@ class Aircraft(Model):
         sp_motor = Variable("sp_{motor}", 7./9.81, "kW/N",
                             'Motor specific power')
         Wmotor = Variable("W_{motor}", "lbf", "motor weight")
+        Wcent = Variable("W_{cent}", "lbf", "aircraft center weight")
         fstruct = Variable("f_{struct}", 0.2, "-",
                            "structural weight fraction")
         Wstruct = Variable("W_{struct}", "lbf", "structural weight")
         b = Variable("b", "ft", "Wing span")
 
-        constraints = [W >= Wbatt + Wpay + Wwing + Wmotor + Wstruct,
-                       Wstruct >= fstruct*W,
-                       Wwing >= WS*S,
-                       Wmotor >= Pshaftmax/sp_motor,
-                       AR == b**2/S]
 
-        return constraints
+        constraints = [
+            W >= Wbatt + Wpay + self.wing.topvar("W") + Wmotor + Wstruct,
+            Wcent >= Wbatt + Wpay + Wmotor + Wstruct,
+            Wstruct >= fstruct*W,
+            Wmotor >= Pshaftmax/sp_motor]
+
+        loading = self.wing.loading(self.wing, Wcent)
+        loading.substitutions.update({"\\kappa": 0.05,
+                                      "\\sigma_{CFRP}": 1.5e9})
+
+        return constraints, self.wing, loading
 
     def flight_model(self):
         " what happens during flight "
@@ -46,21 +53,23 @@ class AircraftPerf(Model):
     " simple drag model "
     def setup(self, aircraft):
 
-        CL = Variable("C_L", "-", "lift coefficient")
+        self.fs = FlightState()
+        self.wing = aircraft.wing.flight_model(aircraft.wing, self.fs)
+        self.wing.substitutions["C_{L_{stall}}"] = 5
+
         CD = Variable("C_D", "-", "drag coefficient")
         cda = Variable("CDA", 0.024, "-", "non-lifting drag coefficient")
-        e = Variable("e", 0.8, "-", "span efficiency")
 
-        constraints = [CD >= cda + CL**2/pi/e/aircraft["AR"]]
+        constraints = [CD >= cda + self.wing["C_d"]]
 
-        return constraints
+        return constraints, self.wing, self.fs
 
 class Cruise(Model):
     " calculates aircraft range "
     def setup(self, aircraft):
 
-        fs = FlightState()
-        aircraftperf = aircraft.flight_model()
+        perf = aircraft.flight_model()
+        perf.fs.substitutions["V"] = 150
 
         R = Variable("R", 200, "nmi", "aircraft range")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
@@ -69,27 +78,27 @@ class Cruise(Model):
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propellor efficiency")
 
         constraints = [
-            aircraft["W"] == (0.5*aircraftperf["C_L"]*fs["\\rho"]
-                              * aircraft["S"]*fs["V"]**2),
-            T >= 0.5*aircraftperf["C_D"]*fs["\\rho"]*aircraft["S"]*fs["V"]**2,
-            Pshaft >= T*fs["V"]/etaprop,
+            aircraft.topvar("W") == (0.5*perf["C_L"]*perf["\\rho"]
+                                     * aircraft["S"]*perf["V"]**2),
+            T >= 0.5*perf["C_D"]*perf["\\rho"]*aircraft.wing["S"]*perf["V"]**2,
+            Pshaft >= T*perf["V"]/etaprop,
             R <= (aircraft["h_{batt}"]*aircraft["W_{batt}"]/g
-                  * aircraft["\\eta_{e}"]*fs["V"]/Pshaft)]
+                  * aircraft["\\eta_{e}"]*perf["V"]/Pshaft)]
 
-        return constraints, aircraftperf, fs
+        return constraints, perf
 
 class Mission(Model):
     " creates aircraft and flies it around "
     def setup(self):
 
-        aircraft = Aircraft()
+        self.aircraft = Aircraft()
 
-        takeoff = TakeOff(aircraft)
-        cruise = Cruise(aircraft)
+        takeoff = TakeOff(self.aircraft)
+        cruise = Cruise(self.aircraft)
 
-        constraints = [aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"]]
+        constraints = [self.aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"]]
 
-        return constraints, aircraft, takeoff, cruise
+        return constraints, self.aircraft, takeoff, cruise
 
 class TakeOff(Model):
     """
@@ -99,7 +108,6 @@ class TakeOff(Model):
     """
     def setup(self, aircraft, sp=False):
 
-        fs = FlightState()
         perf = aircraft.flight_model()
 
         A = Variable("A", "m/s**2", "log fit equation helper 1")
@@ -125,28 +133,30 @@ class TakeOff(Model):
         fd = df.to_dict(orient="records")[0]
 
         constraints = [
-            T/aircraft["W"] >= A/g + mu,
-            T <= aircraft["P_{shaft-max}"]*etaprop/fs["V"],
+            T/aircraft.topvar("W") >= A/g + mu,
+            T <= aircraft["P_{shaft-max}"]*etaprop/perf["V"],
             CLmax >= perf["C_L"],
-            Vstall == (2*aircraft["W"]/fs["\\rho"]/aircraft["S"]
+            Vstall == (2*aircraft.topvar("W")/perf["\\rho"]/aircraft.wing["S"]
                        / perf["C_L"])**0.5,
-            fs["V"] == 1.2*Vstall,
-            FitCS(fd, zsto, [A/g, B*fs["V"]**2/g]),
+            perf["V"] == 1.2*Vstall,
+            FitCS(fd, zsto, [A/g, B*perf["V"]**2/g]),
             Sto >= 1.0/2.0/B*zsto]
 
         if sp:
             with SignomialsEnabled():
                 constraints.extend([
-                    (B*aircraft["W"]/g + 0.5*fs["\\rho"]*aircraft["S"]*mu
-                     * CLg >= 0.5*fs["\\rho"]*aircraft["S"]*CDg)])
+                    (B*aircraft.topvar("W")/g + 0.5*perf["\\rho"]
+                     * aircraft.wing["S"]*mu*CLg >= 0.5*perf["\\rho"]
+                     * aircraft.wing["S"]*CDg)])
         else:
             constraints.extend([
-                B >= g/aircraft["W"]*0.5*fs["\\rho"]*aircraft["S"]*perf["C_D"]])
+                B >= (g/aircraft.topvar("W")*0.5*perf["\\rho"]
+                      * aircraft.wing["S"]*perf["C_D"])])
 
-        return constraints, perf, fs
+        return constraints, perf
 
 if __name__ == "__main__":
     M = Mission()
-    M.cost = M["W"]
+    M.cost = M.aircraft.topvar("W")
     sol = M.solve("mosek")
     print sol.table()
