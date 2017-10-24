@@ -37,7 +37,8 @@ class Aircraft(Model):
             W >= Wbatt + Wpay + self.wing.topvar("W") + Wmotor + Wstruct,
             Wcent >= Wbatt + Wpay + Wmotor + Wstruct,
             Wstruct >= fstruct*W,
-            Wmotor >= Pshaftmax/sp_motor]
+            Wmotor >= Pshaftmax/sp_motor,
+            ]
 
         loading = self.wing.loading(self.wing, Wcent)
         loading.substitutions.update({"\\kappa": 0.05,
@@ -89,21 +90,25 @@ class Cruise(Model):
 
 class Mission(Model):
     " creates aircraft and flies it around "
-    def setup(self):
+    def setup(self, sp=False):
 
         Srunway = Variable("S_{runway}", "ft", "runway length")
 
-        aircraft = Aircraft()
+        self.aircraft = Aircraft()
 
-        takeoff = TakeOff(aircraft)
-        cruise = Cruise(aircraft)
-        landing = Landing(aircraft, sp=False)
+        takeoff = TakeOff(self.aircraft, sp=sp)
+        cruise = Cruise(self.aircraft)
+        mission = [takeoff, cruise]
 
-        constraints = [aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"],
-                       Srunway >= takeoff["S_{TO}"],
-                       Srunway >= landing["S_{land}"]]
+        constraints = [self.aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"],
+                       Srunway >= takeoff["S_{TO}"]]
 
-        return constraints, aircraft, takeoff, cruise, landing
+        if sp:
+            landing = Landing(self.aircraft)
+            constraints.extend([Srunway >= landing["S_{land}"]])
+            mission.extend([landing])
+
+        return constraints, self.aircraft, mission
 
 class TakeOff(Model):
     """
@@ -127,13 +132,14 @@ class TakeOff(Model):
         cdp = Variable("c_{d_{p_{stall}}}", 0.025, "-",
                        "profile drag at Vstallx1.2")
         Kg = Variable("K_g", 0.04, "-", "ground-effect induced drag parameter")
-        CLmax = Variable("C_{L_{max}}", 3.4, "-", "max lift coefficient")
+        CLto = Variable("C_{L_{TO}}", 3.4, "-", "max lift coefficient")
         Vstall = Variable("V_{stall}", "knots", "stall velocity")
         e = Variable("e", 0.8, "-", "span efficiency")
 
         zsto = Variable("z_{S_{TO}}", "-", "take off distance helper variable")
-        Sto = Variable("S_{TO}", 300, "ft", "take off distance")
+        Sto = Variable("S_{TO}", "ft", "take off distance")
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propellor efficiency")
+        mfac = Variable("m_{fac}", 1.2, "-", "TO distance margin")
 
         path = os.path.dirname(os.path.abspath(__file__))
         df = pd.read_csv(path + os.sep + "logfit.csv")
@@ -142,18 +148,18 @@ class TakeOff(Model):
         constraints = [
             T/aircraft.topvar("W") >= A/g + mu,
             T <= aircraft["P_{shaft-max}"]*etaprop/fs["V"],
-            CDg >= 0.024 + cdp + CLmax**2/pi/aircraft["AR"]/e,
+            CDg >= 0.024 + cdp + CLto**2/pi/aircraft["AR"]/e,
             Vstall == (2*aircraft.topvar("W")/fs["\\rho"]/aircraft.wing["S"]
-                       / CLmax)**0.5,
+                       / CLto)**0.5,
             fs["V"] == 1.2*Vstall,
             FitCS(fd, zsto, [A/g, B*fs["V"]**2/g]),
-            Sto >= 1.0/2.0/B*zsto]
+            Sto/mfac >= 1.0/2.0/B*zsto]
 
         if sp:
             with SignomialsEnabled():
                 constraints.extend([
                     (B*aircraft.topvar("W")/g + 0.5*fs["\\rho"]
-                     * aircraft.wing["S"]*mu*CLg >= 0.5*fs["\\rho"]
+                     * aircraft.wing["S"]*mu*CLto >= 0.5*fs["\\rho"]
                      * aircraft.wing["S"]*CDg)])
         else:
             constraints.extend([
@@ -162,10 +168,13 @@ class TakeOff(Model):
 
         return constraints, fs
 
-  if __name__ == "__main__":
-    M = Mission()
+if __name__ == "__main__":
+    SP = True
+    M = Mission(sp=SP)
     M.substitutions.update({"S_{runway}": 300})
-    M.cost = M["W"]
-    #sol = M.debug("mosek")
-    sol = M.localsolve("mosek")
+    M.cost = M.aircraft.topvar("W")
+    if SP:
+        sol = M.localsolve("mosek")
+    else:
+        sol = M.solve("mosek")
     print sol.table()
