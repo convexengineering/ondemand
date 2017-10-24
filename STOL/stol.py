@@ -1,6 +1,7 @@
 " short take off and landing aircraft model "
 import os
 import pandas as pd
+from numpy import pi
 from gpkit import Variable, Model, SignomialsEnabled
 from gpkitmodels.GP.aircraft.wing.wing import Wing
 from gpfit.fit_constraintset import FitCS
@@ -19,8 +20,6 @@ class Aircraft(Model):
         hbatt = Variable("h_{batt}", 210, "W*hr/kg", "battery specific energy")
         etae = Variable("\\eta_{e}", 0.9, "-", "total electrical efficiency")
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
-        WS = Variable("(W/S)", 2.5, "lbf/ft**2",
-                      "wing weight scaling factor")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Pshaftmax = Variable("P_{shaft-max}", "W", "max shaft power")
         sp_motor = Variable("sp_{motor}", 7./9.81, "kW/N",
@@ -108,8 +107,7 @@ class TakeOff(Model):
     """
     def setup(self, aircraft, sp=False):
 
-        perf = aircraft.flight_model()
-
+        fs = FlightState()
         A = Variable("A", "m/s**2", "log fit equation helper 1")
         B = Variable("B", "1/m", "log fit equation helper 2")
 
@@ -120,9 +118,12 @@ class TakeOff(Model):
 
         CLg = Variable("C_{L_g}", "-", "ground lift coefficient")
         CDg = Variable("C_{D_g}", "-", "grag ground coefficient")
+        cdp = Variable("c_{d_{p_{stall}}}", 0.025, "-",
+                       "profile drag at Vstallx1.2")
         Kg = Variable("K_g", 0.04, "-", "ground-effect induced drag parameter")
         CLmax = Variable("C_{L_{max}}", 3.4, "-", "max lift coefficient")
-        Vstall = Variable("V_{stall}", "m/s", "stall velocity")
+        Vstall = Variable("V_{stall}", "knots", "stall velocity")
+        e = Variable("e", 0.8, "-", "span efficiency")
 
         zsto = Variable("z_{S_{TO}}", "-", "take off distance helper variable")
         Sto = Variable("S_{TO}", 300, "ft", "take off distance")
@@ -134,26 +135,26 @@ class TakeOff(Model):
 
         constraints = [
             T/aircraft.topvar("W") >= A/g + mu,
-            T <= aircraft["P_{shaft-max}"]*etaprop/perf["V"],
-            CLmax >= perf["C_L"],
-            Vstall == (2*aircraft.topvar("W")/perf["\\rho"]/aircraft.wing["S"]
-                       / perf["C_L"])**0.5,
-            perf["V"] == 1.2*Vstall,
-            FitCS(fd, zsto, [A/g, B*perf["V"]**2/g]),
+            T <= aircraft["P_{shaft-max}"]*etaprop/fs["V"],
+            CDg >= 0.024 + cdp + CLmax**2/pi/aircraft["AR"]/e,
+            Vstall == (2*aircraft.topvar("W")/fs["\\rho"]/aircraft.wing["S"]
+                       / CLmax)**0.5,
+            fs["V"] == 1.2*Vstall,
+            FitCS(fd, zsto, [A/g, B*fs["V"]**2/g]),
             Sto >= 1.0/2.0/B*zsto]
 
         if sp:
             with SignomialsEnabled():
                 constraints.extend([
-                    (B*aircraft.topvar("W")/g + 0.5*perf["\\rho"]
-                     * aircraft.wing["S"]*mu*CLg >= 0.5*perf["\\rho"]
+                    (B*aircraft.topvar("W")/g + 0.5*fs["\\rho"]
+                     * aircraft.wing["S"]*mu*CLg >= 0.5*fs["\\rho"]
                      * aircraft.wing["S"]*CDg)])
         else:
             constraints.extend([
-                B >= (g/aircraft.topvar("W")*0.5*perf["\\rho"]
-                      * aircraft.wing["S"]*perf["C_D"])])
+                B >= (g/aircraft.topvar("W")*0.5*fs["\\rho"]
+                      * aircraft.wing["S"]*CDg)])
 
-        return constraints, perf
+        return constraints, fs
 
 if __name__ == "__main__":
     M = Mission()
