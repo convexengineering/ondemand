@@ -11,7 +11,7 @@ def plot_torange(N, clmax, to=True):
     " plot trade studies of weight, range, and TO distance "
 
     model = Mission(sp=True)
-    sto = np.linspace(50, 500, N)
+    sto = np.linspace(50, 450, N)
 
     st = [":", "-.", "--", "-"]
     i = 0
@@ -26,15 +26,11 @@ def plot_torange(N, clmax, to=True):
                 label="$C_{L_{max}} = %.1f$" % cl)
         i += 1
 
-    if to:
-        ax.set_xlabel("Take off Distance [ft]")
-    else:
-        ax.set_xlabel("Landing Distance [ft]")
-
+    ax.set_xlabel("Runway Distance [ft]")
     ax.set_ylabel("Range [nmi]")
     ax.set_ylim([0, 350])
     ax.grid()
-    ax.legend(loc=4)
+    ax.legend(loc=4, fontsize=15)
 
     return fig, ax
 
@@ -65,10 +61,10 @@ def plot_wrange(model, sto, Nr, plot=True):
         if plot:
             W = sol(model.aircraft.topvar("W"))
             ax.plot(R, W, color="k", linestyle=st[i],
-                    label="$S_{TO} = %d [ft]$" % s)
+                    label="$S_{runwawy} = %d [ft]$" % s)
             lands = sol["sensitivities"]["constants"]["m_{fac}_Mission/Landing"]
             axs.plot(R, lands, color="k", linestyle=st[i],
-                     label="$S_{TO} = %d [ft]$" % s)
+                     label="$S_{runway} = %d [ft]$" % s)
             i += 1
         else:
             stosens = sol["sensitivities"]["constants"]["S_{runway}"]
