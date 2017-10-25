@@ -7,58 +7,102 @@ from gpkit.tools.autosweep import autosweep_1d
 plt.rcParams.update({'font.size':19})
 
 # pylint: disable=invalid-name, too-many-locals
-def plot_torange(N):
+def plot_torange(N, clmax, to=True):
     " plot trade studies of weight, range, and TO distance "
-    M = Mission()
-    M.cost = M["W"]
 
-    sto = np.linspace(100, 700, N)
+    model = Mission(sp=True)
+    sto = np.linspace(50, 500, N)
+
+    st = [":", "-.", "--", "-"]
+    i = 0
+    fig, ax = plt.subplots()
+    for cl in clmax:
+        if to:
+            model.substitutions.update({"C_{L_{TO}}": cl})
+        else:
+            model.substitutions.update({"C_{L_{land}}": cl})
+        Rknee = plot_wrange(model, sto, 10, plot=False)
+        ax.plot(sto, Rknee, color="k", linestyle=st[i],
+                label="$C_{L_{max}} = %.1f$" % cl)
+        i += 1
+
+    if to:
+        ax.set_xlabel("Take off Distance [ft]")
+    else:
+        ax.set_xlabel("Landing Distance [ft]")
+
+    ax.set_ylabel("Range [nmi]")
+    ax.set_ylim([0, 350])
+    ax.grid()
+    ax.legend(loc=4)
+
+    return fig, ax
+
+def plot_wrange(model, sto, Nr, plot=True):
+    model.cost = model.aircraft.topvar("W")
+
     Rmin = 25
 
-    fig, ax = plt.subplots()
+    if plot:
+        fig, ax = plt.subplots()
+        figs, axs = plt.subplots()
 
     st = [":", "-.", "--", "-"]*5
     i = 0
     Rknee = []
-    del M.substitutions["R"]
 
     for s in sto:
-        M.substitutions.update({"S_{TO}": s})
-        M.cost = 1/M["R"]
-        sol = M.solve("mosek")
+        model.substitutions.update({"S_{runway}": s})
+        del model.substitutions["R"]
+        model.cost = 1/model["R"]
+        sol = model.localsolve("mosek")
         Rmax = sol("R").magnitude
-        M.cost = M["W"]
-        R = np.linspace(Rmin, Rmax-10, 100)
-        Bst = autosweep_1d(M, 0.01, M["R"], [Rmin, Rmax-10], solver="mosek")
+        model.cost = model.aircraft.topvar("W")
+        R = np.linspace(Rmin, Rmax-10, Nr)
+        model.substitutions.update({"R": ("sweep", R)})
+        sol = model.localsolve("mosek", skipsweepfailures=True)
 
-        if len(sto) < 6:
-            W = Bst.sample_at(R)("W")
+        if plot:
+            W = sol(model.aircraft.topvar("W"))
             ax.plot(R, W, color="k", linestyle=st[i],
                     label="$S_{TO} = %d [ft]$" % s)
+            lands = sol["sensitivities"]["constants"]["m_{fac}_Mission/Landing"]
+            axs.plot(R, lands, color="k", linestyle=st[i],
+                     label="$S_{TO} = %d [ft]$" % s)
             i += 1
+        else:
+            stosens = sol["sensitivities"]["constants"]["S_{runway}"]
+            f = interp1d(stosens, sol("R"), "cubic")
+            if -0.8 < min(stosens):
+                Rknee.extend([np.nan])
+            else:
+                Rknee.extend([f(-0.8)])
 
-        stosens = Bst.solarray["sensitivities"]["constants"]["S_{TO}"]
-        f = interp1d(stosens, Bst.solarray("R"), "cubic")
-        Rknee.extend([f(-0.8)])
-
-    if len(sto) > 6:
-        ax.plot(sto, Rknee)
-        ax.set_xlabel("Take off Distance [ft]")
-        ax.set_ylabel("Range [nmi]")
-        ax.set_ylim([0, 350])
-        ax.grid()
-
-    if len(sto) < 6:
+    if plot:
         ax.set_ylabel("Max Takeoff Weight [lbf]")
         ax.set_xlabel("Range [nmi]")
-        ax.legend(loc=2)
+        ax.legend(loc=4, fontsize=12)
         ax.grid()
         ax.set_ylim([0, 10000])
+        axs.set_ylabel("Landing Sensitivity")
+        axs.set_xlabel("Range [nmi]")
+        axs.legend(loc=2, fontsize=12)
+        axs.grid()
+        axs.set_ylim([-0.1, 1])
 
-    return fig, ax
+    if plot:
+        ret = [fig, figs]
+    else:
+        ret = Rknee
+
+    return ret
 
 if __name__ == "__main__":
-    Fig, _ = plot_torange(5)
-    Fig.savefig("mtowrange.pdf", bbox_inches="tight")
-    Fig, _ = plot_torange(25)
+    M = Mission(sp=True)
+    # Figs = plot_wrange(M, [100, 200, 300, 400, 500], 20, plot=True)
+    # Figs[0].savefig("mtowrange.pdf", bbox_inches="tight")
+    # Figs[1].savefig("landingsens.pdf", bbox_inches="tight")
+    Fig, _ = plot_torange(20, [3.3, 4.5, 5.5])
     Fig.savefig("rangetod.pdf", bbox_inches="tight")
+    Fig, _ = plot_torange(20, [3.3, 4.5, 5.5], to=False)
+    Fig.savefig("rangelandd.pdf", bbox_inches="tight")
