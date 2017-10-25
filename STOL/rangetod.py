@@ -99,10 +99,10 @@ def plot_wrange(model, sto, Nr, plot=True):
 
 if __name__ == "__main__":
     M = Mission(sp=True)
-    # Figs = plot_wrange(M, [100, 200, 300, 400, 500], 20, plot=True)
-    # Figs[0].savefig("mtowrange.pdf", bbox_inches="tight")
-    # Figs[1].savefig("landingsens.pdf", bbox_inches="tight")
-    Fig, _ = plot_torange(20, [3.3, 4.5, 5.5])
+    Figs = plot_wrange(M, [100, 200, 300, 400, 500], 20, plot=True)
+    Figs[0].savefig("mtowrange.pdf", bbox_inches="tight")
+    Figs[1].savefig("landingsens.pdf", bbox_inches="tight")
+    Fig, _ = plot_torange(20, [3.5, 4.5, 5.5])
     Fig.savefig("rangetod.pdf", bbox_inches="tight")
-    Fig, _ = plot_torange(20, [3.3, 4.5, 5.5], to=False)
+    Fig, _ = plot_torange(20, [3.5, 4.5, 5.5], to=False)
     Fig.savefig("rangelandd.pdf", bbox_inches="tight")
