@@ -202,14 +202,14 @@ class TakeOff(Model):
         return constraints, fs
 
 if __name__ == "__main__":
-    SP = False
+    SP = True
     M = Mission(sp=SP)
     M.substitutions.update({"S_{runway}": 500})
     M.substitutions.update({"R": 150})
     M.substitutions.update({"W_{pay}": 400})
     M.cost = M.aircraft.topvar("W")
     if SP:
-        sol = M.localsolve("cvxopt")
+        sol = M.localsolve("mosek")
     else:
-        sol = M.solve("cvxopt")
+        sol = M.solve("mosek")
     print sol.table()
