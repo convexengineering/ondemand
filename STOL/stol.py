@@ -33,14 +33,12 @@ class Aircraft(Model):
                            "structural weight fraction")
         Wstruct = Variable("W_{struct}", "lbf", "structural weight")
         e = Variable("e", 0.8, "-", "span efficiency factor")
-        bmax = Variable("b", 50, "ft", "span constraint")
 
         constraints = [
             TCS([W >= Wbatt + Wpay + self.wing.topvar("W") + Wmotor + Wstruct]),
             Wcent >= Wbatt + Wpay + Wmotor + Wstruct,
             Wstruct >= fstruct*W,
             Wmotor >= Pshaftmax/sp_motor,
-            self.wing["b"] <= bmax
             ]
 
         loading = self.wing.loading(self.wing, Wcent)
@@ -74,7 +72,8 @@ class Cruise(Model):
 
         perf = aircraft.flight_model()
 
-        R = Variable("R", 200, "nmi", "aircraft range")
+        R = Variable("R", "nmi", "aircraft range")
+        Rmin = Variable("R_{min}", 100, "nmi", "minimum aircraft range")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         T = Variable("T", "lbf", "thrust")
         Vmin = Variable("V_{min}", 120, "kts", "min speed")
@@ -86,6 +85,7 @@ class Cruise(Model):
                                      * aircraft["S"]*perf["V"]**2),
             T >= 0.5*perf["C_D"]*perf["\\rho"]*aircraft.wing["S"]*perf["V"]**2,
             Pshaft >= T*perf["V"]/etaprop,
+            R >= Rmin,
             perf.fs["V"] >= Vmin,
             R <= (aircraft["h_{batt}"]*aircraft["W_{batt}"]/g
                   * aircraft["\\eta_{e}"]*perf["V"]/Pshaft)]
@@ -120,6 +120,7 @@ class Mission(Model):
     def setup(self, sp=False):
 
         Srunway = Variable("S_{runway}", "ft", "runway length")
+        Srunmax = Variable("S_{max}", 500, "ft", "maximum runway length")
 
         self.aircraft = Aircraft()
 
@@ -128,7 +129,8 @@ class Mission(Model):
         mission = [takeoff, cruise]
 
         constraints = [self.aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"],
-                       Srunway >= takeoff["S_{TO}"]]
+                       Srunway >= takeoff["S_{TO}"],
+                       Srunway <= Srunmax]
 
         if sp:
             landing = Landing(self.aircraft)
@@ -204,10 +206,7 @@ class TakeOff(Model):
 if __name__ == "__main__":
     SP = True
     M = Mission(sp=SP)
-    M.substitutions.update({"S_{runway}": 500})
-    M.substitutions.update({"R": 150})
-    M.substitutions.update({"W_{pay}": 400})
-    M.cost = M.aircraft.topvar("W")
+    M.cost = M["S_{runway}"]*M[M.aircraft.topvar("W")]/M["R"]
     if SP:
         sol = M.localsolve("mosek")
     else:
