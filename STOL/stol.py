@@ -8,6 +8,7 @@ from gpfit.fit_constraintset import FitCS
 from flightstate import FlightState
 from landing import Landing
 from gpkit.constraints.tight import Tight as TCS
+from gpkit.constraints.relax import ConstantsRelaxed
 
 # pylint: disable=too-many-locals, invalid-name, unused-variable
 
@@ -72,8 +73,7 @@ class Cruise(Model):
 
         perf = aircraft.flight_model()
 
-        R = Variable("R", "nmi", "aircraft range")
-        Rmin = Variable("R_{min}", 100, "nmi", "minimum aircraft range")
+        R = Variable("R", 100, "nmi", "aircraft range")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         T = Variable("T", "lbf", "thrust")
         Vmin = Variable("V_{min}", 120, "kts", "min speed")
@@ -85,7 +85,6 @@ class Cruise(Model):
                                      * aircraft["S"]*perf["V"]**2),
             T >= 0.5*perf["C_D"]*perf["\\rho"]*aircraft.wing["S"]*perf["V"]**2,
             Pshaft >= T*perf["V"]/etaprop,
-            R >= Rmin,
             perf.fs["V"] >= Vmin,
             R <= (aircraft["h_{batt}"]*aircraft["W_{batt}"]/g
                   * aircraft["\\eta_{e}"]*perf["V"]/Pshaft)]
@@ -120,7 +119,6 @@ class Mission(Model):
     def setup(self, sp=False):
 
         Srunway = Variable("S_{runway}", "ft", "runway length")
-        Srunmax = Variable("S_{max}", 500, "ft", "maximum runway length")
 
         self.aircraft = Aircraft()
 
@@ -129,8 +127,7 @@ class Mission(Model):
         mission = [takeoff, cruise]
 
         constraints = [self.aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"],
-                       Srunway >= takeoff["S_{TO}"],
-                       Srunway <= Srunmax]
+                       Srunway >= takeoff["S_{TO}"]]
 
         if sp:
             landing = Landing(self.aircraft)
@@ -206,7 +203,10 @@ class TakeOff(Model):
 if __name__ == "__main__":
     SP = True
     M = Mission(sp=SP)
-    M.cost = M["S_{runway}"]*M[M.aircraft.topvar("W")]/M["R"]
+    M.substitutions.update({"R": 100, "S_{runway}": 300})
+    M.cost = M[M.aircraft.topvar("W")]
+    # cr = ConstantsRelaxed(M)
+    # M = Model(cr.relaxvars.prod()*M.cost**0.01, cr)
     if SP:
         sol = M.localsolve("mosek")
     else:
