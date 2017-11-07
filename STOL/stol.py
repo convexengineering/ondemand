@@ -91,7 +91,7 @@ class Cruise(Model):
 
         return constraints, perf
 
-class LandingSimple(Model):
+class GLanding(Model):
     def setup(self, aircraft):
 
         fs = FlightState()
@@ -134,7 +134,7 @@ class Mission(Model):
             constraints.extend([Srunway >= landing["S_{land}"]])
             mission.extend([landing])
         else:
-            landing = LandingSimple(self.aircraft)
+            landing = GLanding(self.aircraft)
             constraints.extend([Srunway >= landing["S_{land}"]])
             mission.extend([landing])
 
@@ -201,12 +201,10 @@ class TakeOff(Model):
         return constraints, fs
 
 if __name__ == "__main__":
-    SP = True
+    SP = False
     M = Mission(sp=SP)
     M.substitutions.update({"R": 100, "S_{runway}": 300})
     M.cost = M[M.aircraft.topvar("W")]
-    # cr = ConstantsRelaxed(M)
-    # M = Model(cr.relaxvars.prod()*M.cost**0.01, cr)
     if SP:
         sol = M.localsolve("mosek")
     else:

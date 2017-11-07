@@ -10,8 +10,9 @@ plt.rcParams.update({'font.size':19})
 def plot_torange(N, vname, vrange):
     " plot trade studies of weight, range, and TO distance "
 
-    model = Mission(sp=True)
-    sto = np.linspace(200, 500, N)
+    model = Mission(sp=False)
+    del model.substitutions["R"]
+    sto = np.linspace(50, 500, N)
 
     clrs = ["#084081", "#0868ac", "#2b8cbe", "#4eb3d3", "#7bccc4"]*5
     i = 0
@@ -32,6 +33,7 @@ def plot_torange(N, vname, vrange):
     return fig, ax
 
 def plot_wrange(model, sto, Nr, plot=True):
+    " plot weight vs range "
     model.cost = model.aircraft.topvar("W")
     model.substitutions["V_{min}"] = 100
 
@@ -49,31 +51,22 @@ def plot_wrange(model, sto, Nr, plot=True):
 
     for s in sto:
         model.substitutions.update({"S_{runway}": s})
-        del model.substitutions["R"]
         model.cost = 1/model["R"]
-        sol = model.localsolve("mosek")
-        Rmax = sol("R").magnitude
-        model.cost = model.aircraft.topvar("W")
-        R = np.linspace(Rmin, Rmax-10, Nr)
-        model.substitutions.update({"R": ("sweep", R)})
-        sol = model.localsolve("mosek", skipsweepfailures=True)
+        sol = model.solve("mosek")
+        Rmax = sol("R").magnitude - 10
+        model.cost = model[model.aircraft.topvar("W")]
+        bst = autosweep_1d(model, 0.1, model["R"], [Rmin, Rmax])
+        solR = bst.solarray("R")
+        stosens = bst.solarray["sensitivities"]["constants"]["R"]
+        fbatt = bst.solarray("W_{batt}")/bst.solarray(
+            model.aircraft.topvar("W"))
+        wair = bst.solarray(model.aircraft.topvar("W"))
+        lands = bst.solarray["sensitivities"]["constants"][
+            "m_{fac}_Mission/GLanding"]
 
-        if plot:
-            W = sol(model.aircraft.topvar("W"))
-            ax.plot(sol("R"), W, color=clrs[i],
-                    label="$S_{runwawy} = %d [ft]$" % s)
-            axv.plot(sol("R"), sol("W_{batt}")/sol(M.aircraft.topvar("W")),
-                     color=clrs[i], label="$S_{runway} = %d [ft]$" % s)
-            lands = sol["sensitivities"]["constants"]["m_{fac}_Mission/Landing"]
-            axs.plot(sol("R"), lands, color=clrs[i],
-                     label="$S_{runway} = %d [ft]$" % s)
-            i += 1
-        # else:
-        stosens = sol["sensitivities"]["constants"]["R"]
-        f = interp1d(stosens, sol("R"), "cubic")
-        fw = interp1d(stosens, sol(model.aircraft.topvar("W")), "cubic")
-        fwf = interp1d(stosens, sol("W_{batt}")/sol(model.aircraft.topvar("W")),
-                       "cubic")
+        f = interp1d(stosens, solR, "cubic")
+        fw = interp1d(stosens, wair, "cubic")
+        fwf = interp1d(stosens, fbatt, "cubic")
         if 1.0 > max(stosens):
             Rknee.extend([np.nan])
             wint = np.nan
@@ -84,8 +77,20 @@ def plot_wrange(model, sto, Nr, plot=True):
             wbint = fwf(1.0)
 
         if plot:
+            axs.plot(solR, lands, color=clrs[i],
+                     label="$S_{runway} = %d [ft]$" % s)
+            x = np.linspace(Rmin, Rmax, 100)
+            solR = bst.sample_at(x)["R"]
+            fbatt = bst.sample_at(x)["W_{batt}"]/bst.sample_at(x)[
+                model.aircraft.topvar("W")]
+            wair = bst.sample_at(x)[model.aircraft.topvar("W")]
+            ax.plot(solR, wair, color=clrs[i],
+                    label="$S_{runwawy} = %d [ft]$" % s)
+            axv.plot(solR, fbatt, color=clrs[i],
+                     label="$S_{runway} = %d [ft]$" % s)
             ax.plot(Rknee[-1], wint, marker='o', color="k", markersize=5)
             axv.plot(Rknee[-1], wbint, marker='o', color="k", markersize=5)
+            i += 1
 
     if plot:
         ax.set_ylabel("Max Takeoff Weight [lbf]")
@@ -107,14 +112,15 @@ def plot_wrange(model, sto, Nr, plot=True):
     return ret
 
 if __name__ == "__main__":
-    # M = Mission(sp=True)
-    # Figs = plot_wrange(M, [200, 300, 400, 500], 10, plot=True)
-    # Figs[0].savefig("mtowrangew1200.pdf", bbox_inches="tight")
-    # Figs[1].savefig("landingsens.pdf", bbox_inches="tight")
-    # Figs[2].savefig("vrange.pdf", bbox_inches="tight")
-    # Fig, _ = plot_torange(10, "W_{pay}", [400, 600, 800, 1000, 1200])
-    # Fig.savefig("rangetodwpay.pdf", bbox_inches="tight")
-    Fig, _ = plot_torange(10, "\\mu_Mission/Landing", [0.4, 0.5, 0.6, 0.8])
-    Fig.savefig("rangetodmu.pdf", bbox_inches="tight")
-    Fig, _ = plot_torange(10, "\\eta_{prop}_Mission/Landing", [0.01, 0.1, 0.2])
-    Fig.savefig("rangetodt.pdf", bbox_inches="tight")
+    M = Mission(sp=False)
+    del M.substitutions["R"]
+    Figs = plot_wrange(M, [50, 100, 200, 350, 500], 10, plot=True)
+    Figs[0].savefig("mtowrangew1200.pdf", bbox_inches="tight")
+    Figs[1].savefig("landingsens.pdf", bbox_inches="tight")
+    Figs[2].savefig("vrange.pdf", bbox_inches="tight")
+    Fig, _ = plot_torange(20, "W_{pay}", [800])
+    Fig.savefig("rangetodwpay.pdf", bbox_inches="tight")
+    Fig, _ = plot_torange(20, "C_{L_{land}}", [3.5, 4.5, 5.5])
+    Fig.savefig("rangetodclland.pdf", bbox_inches="tight")
+    Fig, _ = plot_torange(20, "C_{L_{TO}}", [3.5, 4.5, 5.5])
+    Fig.savefig("rangetodclto.pdf", bbox_inches="tight")
