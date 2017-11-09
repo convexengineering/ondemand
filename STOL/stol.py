@@ -20,6 +20,8 @@ class Aircraft(Model):
         self.wing = Wing()
 
         W = Variable("W", "lbf", "aircraft weight")
+        WS = Variable("W/S", "lbf/ft^2", "Aircraft wing loading")
+        PW = Variable("P/W", "hp/lbf", "Aircraft shaft hp/weight ratio")
         Wpay = Variable("W_{pay}", 800, "lbf", "payload weight")
         hbatt = Variable("h_{batt}", 210, "W*hr/kg", "battery specific energy")
         etae = Variable("\\eta_{e}", 0.9, "-", "total electrical efficiency")
@@ -36,6 +38,8 @@ class Aircraft(Model):
         e = Variable("e", 0.8, "-", "span efficiency factor")
 
         constraints = [
+            WS == W/self.wing["S"],
+            PW == Pshaftmax/W,
             TCS([W >= Wbatt + Wpay + self.wing.topvar("W") + Wmotor + Wstruct]),
             Wcent >= Wbatt + Wpay + Wmotor + Wstruct,
             Wstruct >= fstruct*W,
@@ -119,6 +123,8 @@ class Mission(Model):
     def setup(self, sp=False):
 
         Srunway = Variable("S_{runway}", "ft", "runway length")
+        PFEI = Variable("PFEI", "kJ/(kg*km)", "PFEI")
+        "Parameters of interest"
 
         self.aircraft = Aircraft()
 
@@ -127,7 +133,8 @@ class Mission(Model):
         mission = [takeoff, cruise]
 
         constraints = [self.aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"],
-                       Srunway >= takeoff["S_{TO}"]]
+                       Srunway >= takeoff["S_{TO}"],
+                       PFEI == self.aircraft["h_{batt}"]*self.aircraft["W_{batt}"]/(cruise["R"]*self.aircraft["W_{pay}"])]
 
         if sp:
             landing = Landing(self.aircraft)

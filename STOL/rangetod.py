@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from stol import Mission
 from gpkit.tools.autosweep import autosweep_1d
+import cPickle as pkl 
 plt.rcParams.update({'font.size':19})
 
 # pylint: disable=invalid-name, too-many-locals
@@ -32,6 +33,43 @@ def plot_torange(N, vname, vrange):
     ax.legend(loc=4, fontsize=15)
 
     return fig, ax
+
+def run_RNWY_RNG_PAY_V_trade_point(filename, srunway, range_nmi, payload_lbs, min_speed_kts=120):
+    """Set up and solve the model for a specified:
+        srunway         Runway length, in ft
+        range_nmi       Cruise range, in nautical miles
+        payload_lbs     Payload weight, in lbs
+        min_speed_kts   Minimum cruise speed, in knots.  Defaults to 120
+
+        Output of sol.table() is written to .out file
+
+        solution array is returned for futher processing
+
+    """
+    M = Mission(sp=False)
+    del M.substitutions["R"]
+    del M.substitutions["W_{pay}"]
+    M.cost = M.aircraft.topvar("W")
+    M.substitutions["V_{min}"] = min_speed_kts
+    M.substitutions.update({"S_{runway}": srunway,
+                            "R": range_nmi,
+                            "W_{pay}": payload_lbs})
+    
+    sol = run_single_point(M, filename)
+
+    return sol
+def run_single_point(M, filename):
+    """
+    Solve a single model, and dump the results of sol.table() into a .out file
+    return the solution array for futher processing
+    """
+    sol = M.solve("mosek")
+    fname = filename+".out"
+    fid = open(fname, "w+")
+    fid.write(sol.table())
+    fid.close()
+    return sol 
+
 
 def plot_wrange(model, sto, Nr, plot=True):
     " plot weight vs range "
@@ -113,6 +151,7 @@ def plot_wrange(model, sto, Nr, plot=True):
     return ret
 
 if __name__ == "__main__":
+    run_RNWY_RNG_PAY_V_trade_point("test",300, 100, 195*4, 120)
     # M = Mission(sp=False)
     # del M.substitutions["R"]
     # Figs = plot_wrange(M, [50, 100, 200, 350, 500], 10, plot=True)
@@ -121,7 +160,7 @@ if __name__ == "__main__":
     # Figs[2].savefig("vrange.pdf", bbox_inches="tight")
     # Fig, _ = plot_torange(20, "W_{pay}", [800])
     # Fig.savefig("rangetodwpay.pdf", bbox_inches="tight")
-    Fig, _ = plot_torange(20, "C_{L_{land}}", [2.5, 3.5, 4.5])
-    Fig.savefig("rangetodclland.pdf", bbox_inches="tight")
-    Fig, _ = plot_torange(20, "C_{L_{TO}}", [2.5, 3.5, 4.5])
-    Fig.savefig("rangetodclto.pdf", bbox_inches="tight")
+    #Fig, _ = plot_torange(20, "C_{L_{land}}", [2.5, 3.5, 4.5])
+    #Fig.savefig("rangetodclland.pdf", bbox_inches="tight")
+    #Fig, _ = plot_torange(20, "C_{L_{TO}}", [2.5, 3.5, 4.5])
+    #Fig.savefig("rangetodclto.pdf", bbox_inches="tight")
