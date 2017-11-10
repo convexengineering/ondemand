@@ -52,7 +52,8 @@ class Landing(Model):
         CLland = Variable("C_{L_{land}}", 3.5, "-", "landing CL")
         cdp = Variable("c_{d_{p_{stall}}}", 0.025, "-",
                        "profile drag at Vstallx1.2")
-
+        V_ref = Variable("V_{ref}", "kts", "Approach reference speed")
+        f_ref = Variable("f_{ref}", 1.3, "-", "Approach reference speed margin above stall")
         path = os.path.dirname(os.path.abspath(__file__))
         df = pd.read_csv(path + os.sep + "logfit.csv")
         fd = df.to_dict(orient="records")[0]
@@ -61,7 +62,8 @@ class Landing(Model):
             T_rev == aircraft["P_{shaft-max}"]*etaprop/fs["V"],
             Vstall == (2.*aircraft.topvar("W")/fs["\\rho"]/aircraft["S"]
                        / CLland)**0.5,
-            fs["V"] >= 1.2*Vstall,
+            fs["V"] >= f_ref*Vstall,
+            V_ref == fs["V"],
             Slnd >= msafety*Sgr,
             FitCS(fd, Sgr*2*B, [A/g, B*fs["V"]**2/g]),
             ]

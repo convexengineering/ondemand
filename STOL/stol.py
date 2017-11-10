@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 from numpy import pi
-from gpkit import Variable, Model, SignomialsEnabled
+from gpkit import Variable, Model, SignomialsEnabled,units
 from gpkitmodels.GP.aircraft.wing.wing import Wing
 from gpfit.fit_constraintset import FitCS
 from flightstate import FlightState
@@ -80,6 +80,8 @@ class Cruise(Model):
         R = Variable("R", 100, "nmi", "aircraft range")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         T = Variable("T", "lbf", "thrust")
+        t_reserve = Variable("t_{reserve}", 20.,"min", "Reserve flight time")
+        R_reserve = Variable("R_{reserve}", "nmi", "Reserve range")
         Vmin = Variable("V_{min}", 120, "kts", "min speed")
         Pshaft = Variable("P_{shaft}", "W", "shaft power")
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propellor efficiency")
@@ -90,7 +92,8 @@ class Cruise(Model):
             T >= 0.5*perf["C_D"]*perf["\\rho"]*aircraft.wing["S"]*perf["V"]**2,
             Pshaft >= T*perf["V"]/etaprop,
             perf.fs["V"] >= Vmin,
-            R <= (aircraft["h_{batt}"]*aircraft["W_{batt}"]/g
+
+            (R+(t_reserve*perf["V"])) <= (aircraft["h_{batt}"]*aircraft["W_{batt}"]/g
                   * aircraft["\\eta_{e}"]*perf["V"]/Pshaft)]
 
         return constraints, perf
@@ -107,13 +110,16 @@ class GLanding(Model):
         Slnd = Variable("S_{land}", "ft", "landing distance")
         msafety = Variable("m_{fac}", 1.4, "-", "Landing safety margin")
         CLland = Variable("C_{L_{land}}", 3.5, "-", "landing CL")
+        V_ref = Variable("V_{ref}", "kts", "Approach reference speed")
+        f_ref = Variable("f_{ref}", 1.3, "-", "Approach reference speed margin above stall")
 
         constraints = [
             Sgr >= 0.5*fs["V"]**2/gload/g,
             Vstall == (2.*aircraft.topvar("W")/fs["\\rho"]/aircraft["S"]
                        / CLland)**0.5,
-            fs["V"] >= 1.2*Vstall,
-            Slnd >= msafety*Sgr
+            Slnd >= msafety*Sgr,
+            fs["V"] >= f_ref*Vstall,
+            V_ref == fs["V"],
             ]
 
         return constraints, fs
