@@ -84,6 +84,32 @@ def run_RNWY_RNG_PAY_V_g_trade_point(filename, srunway, range_nmi, payload_lbs, 
     sol = run_single_point(M, filename)
 
     return sol
+def run_cost_trade_point(filename, srunway, range_nmi, payload_lbs, min_speed_kts, glnd):
+    """Set up and solve the model for a specified:
+        srunway         Runway length, in ft
+        range_nmi       Cruise range, in nautical miles
+        payload_lbs     Payload weight, in lbs
+        min_speed_kts   Minimum cruise speed, in knots.  Defaults to 120
+
+        Output of sol.table() is written to .out file
+
+        solution array is returned for futher processing
+
+    """
+    M = Mission(sp=False)
+    del M.substitutions["R"]
+    del M.substitutions["W_{pay}"]
+    del M.substitutions["g_{loading}"]
+    M.cost = M["Cost_per_trip"]
+    M.substitutions["V_{min}"] = min_speed_kts
+    M.substitutions.update({"S_{runway}": srunway,
+                            "R": range_nmi,
+                            "W_{pay}": payload_lbs,
+                            "g_{loading}":glnd})
+    
+    sol = run_single_point(M, filename)
+
+    return sol
 def run_single_point(M, filename):
     """
     Solve a single model, and dump the results of sol.table() into a .out file
