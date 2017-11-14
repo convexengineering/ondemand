@@ -9,6 +9,7 @@ from flightstate import FlightState
 from landing import Landing
 from gpkit.constraints.tight import Tight as TCS
 from gpkit.constraints.relax import ConstantsRelaxed
+from cost import Cost
 
 # pylint: disable=too-many-locals, invalid-name, unused-variable
 
@@ -104,7 +105,7 @@ class GLanding(Model):
         fs = FlightState()
 
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
-        gload = Variable("g_{loading}", 1.0, "-", "gloading constant")
+        gload = Variable("g_{loading}", 1, "-", "gloading constant")
         Vstall = Variable("V_{stall}", "knots", "stall velocity")
         Sgr = Variable("S_{gr}", "ft", "landing ground roll")
         Slnd = Variable("S_{land}", "ft", "landing distance")
@@ -137,6 +138,7 @@ class Mission(Model):
         takeoff = TakeOff(self.aircraft, sp=sp)
         cruise = Cruise(self.aircraft)
         mission = [takeoff, cruise]
+        cost = Cost(self.aircraft)
 
         constraints = [self.aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"],
                        Srunway >= takeoff["S_{TO}"],
@@ -151,7 +153,7 @@ class Mission(Model):
             constraints.extend([Srunway >= landing["S_{land}"]])
             mission.extend([landing])
 
-        return constraints, self.aircraft, mission
+        return constraints, self.aircraft, mission, cost
 
 class TakeOff(Model):
     """
@@ -217,7 +219,8 @@ if __name__ == "__main__":
     SP = False
     M = Mission(sp=SP)
     M.substitutions.update({"R": 100, "S_{runway}": 300})
-    M.cost = M[M.aircraft.topvar("W")]
+    #M.cost = M[M.aircraft.topvar("W")]
+    M.cost = M["Cost_per_trip"]
     if SP:
         sol = M.localsolve("mosek")
     else:

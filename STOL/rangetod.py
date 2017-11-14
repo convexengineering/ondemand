@@ -58,6 +58,32 @@ def run_RNWY_RNG_PAY_V_trade_point(filename, srunway, range_nmi, payload_lbs, mi
     sol = run_single_point(M, filename)
 
     return sol
+def run_RNWY_RNG_PAY_V_g_trade_point(filename, srunway, range_nmi, payload_lbs, min_speed_kts, glnd):
+    """Set up and solve the model for a specified:
+        srunway         Runway length, in ft
+        range_nmi       Cruise range, in nautical miles
+        payload_lbs     Payload weight, in lbs
+        min_speed_kts   Minimum cruise speed, in knots.  Defaults to 120
+
+        Output of sol.table() is written to .out file
+
+        solution array is returned for futher processing
+
+    """
+    M = Mission(sp=False)
+    del M.substitutions["R"]
+    del M.substitutions["W_{pay}"]
+    del M.substitutions["g_{loading}"]
+    M.cost = M.aircraft.topvar("W")
+    M.substitutions["V_{min}"] = min_speed_kts
+    M.substitutions.update({"S_{runway}": srunway,
+                            "R": range_nmi,
+                            "W_{pay}": payload_lbs,
+                            "g_{loading}":glnd})
+    
+    sol = run_single_point(M, filename)
+
+    return sol
 def run_single_point(M, filename):
     """
     Solve a single model, and dump the results of sol.table() into a .out file
@@ -187,16 +213,33 @@ def print_summary(sol):
     print "S_gr, t: %4.0f ft"%(sol["freevariables"]["S_{ground}"].magnitude)
 
 if __name__ == "__main__":
-    #RNWY = 200
+    import sys
+    #RNWY = 250
     #RNG  = 150
-    #PAY  = 195*5
+    #PAY  = 195*20
     #VCR  = 120
 
-    #filename = "RNWY_%4.0f_RNG_%4.0f_PAY_%4.0f_V_%3.0f" % (RNWY, RNG, PAY, VCR)
+    RNWYs = [250, 500]
+    RNGs  = [50, 100, 150, 200]
+    PAYs  = [p*195 for p in [4, 6, 8, 10, 20]]
+    VCRs  = [80, 100, 120, 140, 160]  #Becomes prim. infeasible for 250ft runway, 160 kts, 200nmi range, 3900lbs payload
+    gLNDs  = [.5, .7, 1]
 
+    for RNWY in RNWYs:
+        for RNG in RNGs:
+            for PAY in PAYs:
+                for VCR in VCRs: 
+                    for gLND in gLNDs:
 
-    #sol = run_RNWY_RNG_PAY_V_trade_point(filename,RNWY, RNG, PAY, VCR)
-    #print_summary(sol)
+                        filename = "Analysis/RNWY_%4.0f_RNG_%4.0f_PAY_%4.0f_V_%3.0f_GLND_%3.0f" % \
+                            (RNWY, RNG, PAY, VCR, gLND*10)
+                        sys.stdout = open(filename+'.sum', 'w+')
+                        try:
+                            sol = run_RNWY_RNG_PAY_V_g_trade_point(filename,RNWY, RNG, PAY, VCR, gLND)
+                            print_summary(sol) 
+                        except:
+                            print "---Error---"
+    """
     M = Mission(sp=False)
     del M.substitutions["R"]
     Figs = plot_wrange(M, [100, 200, 350, 500], 10, plot=True)
@@ -207,6 +250,7 @@ if __name__ == "__main__":
     Fig.savefig("rangetodwpay.pdf", bbox_inches="tight")
     Fig, _ = plot_torange(20, "g_{loading}", [1, .7, .5])
     Fig.savefig("rangetodgland.pdf", bbox_inches="tight")
+    """
     #Fig, _ = plot_torange(20, "C_{L_{land}}", [2.5, 3.5, 4.5])
     #Fig.savefig("rangetodclland.pdf", bbox_inches="tight")
     #Fig, _ = plot_torange(20, "C_{L_{TO}}", [2.5, 3.5, 4.5])
