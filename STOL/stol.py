@@ -23,7 +23,7 @@ class Aircraft(Model):
         W = Variable("W", "lbf", "aircraft weight")
         WS = Variable("W/S", "lbf/ft^2", "Aircraft wing loading")
         PW = Variable("P/W", "hp/lbf", "Aircraft shaft hp/weight ratio")
-        Wpay = Variable("W_{pay}", 800, "lbf", "payload weight")
+        Wpay = Variable("W_{pay}", 195*6., "lbf", "payload weight")
         hbatt = Variable("h_{batt}", 210, "W*hr/kg", "battery specific energy")
         etae = Variable("\\eta_{e}", 0.9, "-", "total electrical efficiency")
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
@@ -39,17 +39,17 @@ class Aircraft(Model):
         e = Variable("e", 0.8, "-", "span efficiency factor")
 
         loading = self.wing.spar.loading(self.wing)
-        loading.substitutions.update({"\\kappa": 0.05,
-                                      "\\sigma_{CFRP}": 1.5e9,
-                                      "N_{max}": 6,
-                                      self.wing.skin["t_{min}"]: 0.012*4,
-                                      self.wing.topvar("m_{fac}"): 1.4,
-                                      self.wing.spar["m_{fac}"]: 0.8})
+        loading.substitutions.update({loading.kappa: 0.05,
+                                      loading.sigmacfrp: 1.5e9,
+                                      loading.Nmax: 6,
+                                      self.wing.skin.tmin: 0.012*4,
+                                      self.wing.mfac: 1.4,
+                                      self.wing.spar.mfac: 0.8})
         constraints = [
-            Wcent == loading["W"],
-            WS == W/self.wing["S"],
+            Wcent == loading.W,
+            WS == W/self.wing.planform.S,
             PW == Pshaftmax/W,
-            TCS([W >= Wbatt + Wpay + self.wing.topvar("W") + Wmotor + Wstruct]),
+            TCS([W >= Wbatt + Wpay + self.wing.W + Wmotor + Wstruct]),
             Wcent >= Wbatt + Wpay + Wmotor + Wstruct,
             Wstruct >= fstruct*W,
             Wmotor >= Pshaftmax/sp_motor,
@@ -68,12 +68,12 @@ class AircraftPerf(Model):
 
         self.fs = FlightState()
         self.wing = aircraft.wing.flight_model(aircraft.wing, self.fs)
-        self.wing.substitutions["C_{L_{stall}}"] = 5
+        self.wing.substitutions[self.wing.CLstall] = 5
 
         CD = Variable("C_D", "-", "drag coefficient")
         cda = Variable("CDA", 0.015, "-", "non-lifting drag coefficient")
 
-        constraints = [CD >= cda + self.wing["C_d"]]
+        constraints = [CD >= cda + self.wing.Cd]
 
         return constraints, self.wing, self.fs
 
@@ -88,12 +88,12 @@ class Cruise(Model):
         T = Variable("T", "lbf", "thrust")
         t_reserve = Variable("t_{reserve}", 20.,"min", "Reserve flight time")
         R_reserve = Variable("R_{reserve}", "nmi", "Reserve range")
-        Vmin = Variable("V_{min}", 120, "kts", "min speed")
+        Vmin = Variable("V_{min}", 100, "kts", "min speed")
         Pshaft = Variable("P_{shaft}", "W", "shaft power")
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propellor efficiency")
 
         constraints = [
-            aircraft.topvar("W") == (0.5*perf["C_L"]*perf["\\rho"]
+            aircraft.topvar("W") == (0.5*perf.wing.CL*perf["\\rho"]
                                      * aircraft["S"]*perf["V"]**2),
             T >= 0.5*perf["C_D"]*perf["\\rho"]*aircraft.wing["S"]*perf["V"]**2,
             Pshaft >= T*perf["V"]/etaprop,
@@ -110,7 +110,7 @@ class GLanding(Model):
         fs = FlightState()
 
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
-        gload = Variable("g_{loading}", 1, "-", "gloading constant")
+        gload = Variable("g_{loading}", 0.5, "-", "gloading constant")
         Vstall = Variable("V_{stall}", "knots", "stall velocity")
         Sgr = Variable("S_{gr}", "ft", "landing ground roll")
         Slnd = Variable("S_{land}", "ft", "landing distance")
@@ -143,7 +143,7 @@ class Mission(Model):
         takeoff = TakeOff(self.aircraft, sp=sp)
         cruise = Cruise(self.aircraft)
         mission = [takeoff, cruise]
-        cost = Cost(self.aircraft)
+        # cost = Cost(self.aircraft)
 
         constraints = [self.aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"],
                        Srunway >= takeoff["S_{TO}"],
@@ -158,7 +158,7 @@ class Mission(Model):
             constraints.extend([Srunway >= landing["S_{land}"]])
             mission.extend([landing])
 
-        return constraints, self.aircraft, mission, cost
+        return constraints, self.aircraft, mission #, cost
 
 class TakeOff(Model):
     """
@@ -223,9 +223,10 @@ class TakeOff(Model):
 if __name__ == "__main__":
     SP = False
     M = Mission(sp=SP)
-    M.substitutions.update({"R": 100, "S_{runway}": 300})
-    #M.cost = M[M.aircraft.topvar("W")]
-    M.cost = M["Cost_per_trip"]
+    M.substitutions.update({"R": 100, "S_{runway}": 300, "V_{min}": 100,
+                            "W_{pay}": 195*6.0})
+    M.cost = M[M.aircraft.topvar("W")]
+    # M.cost = M["Cost_per_trip"]
     if SP:
         sol = M.localsolve("mosek")
     else:
