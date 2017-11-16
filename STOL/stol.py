@@ -102,7 +102,7 @@ class Cruise(Model):
             T >= 0.5*perf["C_D"]*perf["\\rho"]*aircraft.wing["S"]*perf["V"]**2,
             Pshaft >= T*perf["V"]/etaprop,
             perf.fs["V"] >= Vmin,
-            perf["C_L"] <= aircraft["CL_{max_{clean}}"],
+            perf["CL"] <= aircraft["CL_{max_{clean}}"],
 
             (R+(t_reserve*perf["V"])) <= (f_useable*(aircraft["h_{batt}"]*aircraft["W_{batt}"])/g
                   * aircraft["\\eta_{e}"]*perf["V"]/Pshaft)]
@@ -123,7 +123,7 @@ class Climb(Model):
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propellor efficiency")
 
         constraints = [
-            aircraft.topvar("W") == (0.5*perf["C_L"]*perf["\\rho"]
+            aircraft.topvar("W") == (0.5*perf["CL"]*perf["\\rho"]
                                      * aircraft["S"]*perf["V"]**2),
             perf["V"] == V2,
             T_req == 0.5*perf["C_D"]*perf["\\rho"]*aircraft.wing["S"]*perf["V"]**2,
