@@ -245,9 +245,9 @@ if __name__ == "__main__":
     #PAY  = 195*20
     #VCR  = 120
 
-    RNWYs = [250, 500]
+    RNWYs = [300]
     RNGs  = [50, 100, 150, 200]
-    PAYs  = [p*195 for p in [4, 6, 8, 10, 20]]
+    PAYs  = [p*195 for p in [4,6,8,10,20]]
     VCRs  = [80, 100, 120, 140, 160]  #Becomes prim. infeasible for 250ft runway, 160 kts, 200nmi range, 3900lbs payload
     gLNDs  = [.5, .7, 1]
 
