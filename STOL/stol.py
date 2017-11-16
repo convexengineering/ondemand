@@ -40,7 +40,16 @@ class Aircraft(Model):
         CL_max_clean = Variable("CL_{max_{clean}}", 1.6, "-", "Clean CL max")
         CL_max_to = Variable("CL_{max_{to}}", 2.0, "-", "Clean CL max")
         CL_max_aprch = Variable("CL_{max_{aprch}}", 2.4, "-", "Clean CL max")
+
+        loading = self.wing.spar.loading(self.wing)
+        loading.substitutions.update({"\\kappa": 0.05,
+                                      "\\sigma_{CFRP}": 1.5e9,
+                                      "N_{max}": 6,
+                                      self.wing.skin["t_{min}"]: 0.012*4,
+                                      self.wing.topvar("m_{fac}"): 1.4,
+                                      self.wing.spar["m_{fac}"]: 0.8})
         constraints = [
+            Wcent == loading["W"],
             WS == W/self.wing["S"],
             PW == Pshaftmax/W,
             TCS([W >= Wbatt + Wpay + self.wing.topvar("W") + Wmotor + Wstruct]),
@@ -49,9 +58,6 @@ class Aircraft(Model):
             Wmotor >= Pshaftmax/sp_motor,
             ]
 
-        loading = self.wing.loading(self.wing, Wcent)
-        loading.substitutions.update({"\\kappa": 0.05,
-                                      "\\sigma_{CFRP}": 1.5e9})
 
         return constraints, self.wing, loading
 
