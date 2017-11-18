@@ -40,6 +40,7 @@ class Aircraft(Model):
         CL_max_clean = Variable("CL_{max_{clean}}", 1.6, "-", "Clean CL max")
         CL_max_to = Variable("CL_{max_{to}}", 2.0, "-", "Clean CL max")
         CL_max_aprch = Variable("CL_{max_{aprch}}", 2.4, "-", "Clean CL max")
+        fbattmax = Variable("f_{batt,max}", 1.0, "-", "max battery fraction")
 
         loading = self.wing.spar.loading(self.wing)
         loading.substitutions.update({loading.kappa: 0.05,
@@ -56,6 +57,7 @@ class Aircraft(Model):
             Wcent >= Wbatt + Wpay + Wmotor + Wstruct,
             Wstruct >= fstruct*W,
             Wmotor >= Pshaftmax/sp_motor,
+            Wbatt/W <= fbattmax,
             ]
 
 
@@ -161,7 +163,7 @@ class GLanding(Model):
 
 class Mission(Model):
     " creates aircraft and flies it around "
-    def setup(self, sp=False):
+    def setup(self, sp=False, costModel=False):
 
         Srunway = Variable("S_{runway}", "ft", "runway length")
         PFEI = Variable("PFEI", "kJ/(kg*km)", "PFEI")
@@ -174,8 +176,10 @@ class Mission(Model):
         mission = [cruise,
                     takeoff
                     ]
-        cost    = Cost(self.aircraft)
         climb   = Climb(self.aircraft)
+        if costModel:
+            cost    = Cost(self.aircraft)
+            mission.extend([cost])
 
         constraints = [self.aircraft["P_{shaft-max}"] >= cruise["P_{shaft}"],
                        Srunway >= takeoff["S_{TO}"],
@@ -190,7 +194,7 @@ class Mission(Model):
             constraints.extend([Srunway >= landing["S_{land}"]])
             mission.extend([landing])
 
-        return constraints, self.aircraft, mission, climb#, cost
+        return constraints, self.aircraft, mission, climb
 
 class TakeOff(Model):
     """
@@ -263,3 +267,10 @@ if __name__ == "__main__":
     else:
         sol = M.solve("mosek")
     print sol.table()
+
+    M.substitutions.update({"R": 100, "S_{runway}": 600, "V_{min}": 100,
+        "W_{pay}": 2*195, "g_{loading}": 0.3, "C_{L_{TO}}": 4.0,
+        "C_{L_{land}}": 3.5})
+
+    sol = M.solve("mosek")
+

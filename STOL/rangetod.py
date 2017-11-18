@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from stol import Mission
 from gpkit.tools.autosweep import autosweep_1d
-import cPickle as pkl 
+import cPickle as pkl
 plt.rcParams.update({'font.size':19})
 
 # pylint: disable=invalid-name, too-many-locals
@@ -54,7 +54,7 @@ def run_RNWY_RNG_PAY_V_trade_point(filename, srunway, range_nmi, payload_lbs, mi
     M.substitutions.update({"S_{runway}": srunway,
                             "R": range_nmi,
                             "W_{pay}": payload_lbs})
-    
+
     sol = run_single_point(M, filename)
 
     return sol
@@ -80,7 +80,7 @@ def run_RNWY_RNG_PAY_V_g_trade_point(filename, srunway, range_nmi, payload_lbs, 
                             "R": range_nmi,
                             "W_{pay}": payload_lbs,
                             "g_{loading}":glnd})
-    
+
     sol = run_single_point(M, filename)
 
     return sol
@@ -106,7 +106,7 @@ def run_cost_trade_point(filename, srunway, range_nmi, payload_lbs, min_speed_kt
                             "R": range_nmi,
                             "W_{pay}": payload_lbs,
                             "g_{loading}":glnd})
-    
+
     sol = run_single_point(M, filename)
 
     return sol
@@ -120,7 +120,7 @@ def run_single_point(M, filename):
     fid = open(fname, "w+")
     fid.write(sol.table())
     fid.close()
-    return sol 
+    return sol
 
 
 def plot_wrange(model, sto, Nr, plot=True):
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     for RNWY in RNWYs:
         for RNG in RNGs:
             for PAY in PAYs:
-                for VCR in VCRs: 
+                for VCR in VCRs:
                     for gLND in gLNDs:
 
                         filename = "Analysis/RNWY_%4.0f_RNG_%4.0f_PAY_%4.0f_V_%3.0f_GLND_%3.0f" % \
@@ -262,7 +262,7 @@ if __name__ == "__main__":
                         sys.stdout = open(filename+'.sum', 'w+')
                         try:
                             sol = run_RNWY_RNG_PAY_V_g_trade_point(filename,RNWY, RNG, PAY, VCR, gLND)
-                            print_summary(sol) 
+                            print_summary(sol)
                         except:
                             print "---Error---"
     """
