@@ -268,8 +268,8 @@ if __name__ == "__main__":
         sol = M.solve("mosek")
     print sol.table()
 
-    M.substitutions.update({"R": 100, "S_{runway}": 600, "V_{min}": 100,
-        "W_{pay}": 2*195, "g_{loading}": 0.3, "C_{L_{TO}}": 4.0,
+    M.substitutions.update({"R": 100, "S_{runway}": 400, "V_{min}": 100,
+        "W_{pay}": 6.*195, "g_{loading}": 0.3, "C_{L_{TO}}": 4.0,
         "C_{L_{land}}": 3.5})
 
     sol = M.solve("mosek")
