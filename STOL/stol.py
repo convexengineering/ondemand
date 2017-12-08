@@ -44,9 +44,9 @@ class Aircraft(Model):
 
         loading = self.wing.spar.loading(self.wing)
         loading.substitutions.update({loading.kappa: 0.05,
-                                      loading.sigmacfrp: 1.5e9,
+                                      self.wing.spar.material.sigma: 1.5e9,
                                       loading.Nmax: 6,
-                                      self.wing.skin.tmin: 0.012*4,
+                                      self.wing.skin.material.tmin: 0.012*4,
                                       self.wing.mfac: 1.4,
                                       self.wing.spar.mfac: 0.8})
         constraints = [
@@ -209,7 +209,7 @@ class TakeOff(Model):
         B = Variable("B", "1/m", "log fit equation helper 2")
 
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
-        mu = Variable("\\mu", 0.025, "-", "coefficient of friction")
+        mu = Variable("\\mu_b", 0.025, "-", "coefficient of friction")
         T = Variable("T", "lbf", "take off thrust")
         cda = Variable("CDA", 0.024, "-", "parasite drag coefficient")
 
@@ -238,7 +238,7 @@ class TakeOff(Model):
             CDg >= 0.024 + cdp + CLto**2/pi/aircraft["AR"]/e,
             Vstall == (2*aircraft.topvar("W")/fs["\\rho"]/aircraft.wing["S"]
                        / CLto)**0.5,
-            fs["V"] == 1.2*Vstall,
+            fs["V"] == 1.3*Vstall,
             FitCS(fd, zsto, [A/g, B*fs["V"]**2/g]),
             Sground >= 1.0/2.0/B*zsto,
             Sto/msafety >= Sground]
@@ -269,8 +269,19 @@ if __name__ == "__main__":
     print sol.table()
 
     M.substitutions.update({"R": 100, "S_{runway}": 400, "V_{min}": 100,
-        "W_{pay}": 6.*195, "g_{loading}": 0.3, "C_{L_{TO}}": 4.0,
+        "W_{pay}": 5.*195, "g_{loading}": 0.3, "C_{L_{TO}}": 4.0,
         "C_{L_{land}}": 3.5})
 
     sol = M.solve("mosek")
+
+    # M.substitutions.update({"R": 100, "V_{min}": 100, "h_{batt}": 300,
+    #                         "S_{runway}": 200,
+    #                         "m_{fac}_Mission/GLanding": 1.2,
+    #                         "m_{fac}_Mission/TakeOff": 1.2,
+    #                         "sp_{motor}": 7./9.81*0.8,
+    #                         "f_{ref}": 1.1,
+    #                         "g_{loading}": 0.5, "C_{L_{TO}}": 5.0,
+    #                         "C_{L_{land}}": 4.5})
+
+    # sol = M.solve("mosek")
 

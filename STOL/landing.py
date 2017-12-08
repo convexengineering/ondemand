@@ -1,5 +1,5 @@
 " Landing distance model "
-from numpy import pi
+from numpy import pi, log
 import pandas as pd
 import os
 from gpkit import Variable, Model, units, SignomialsEnabled
@@ -78,12 +78,37 @@ class Landing(Model):
 
         return constraints, fs
 
+def gr_landing(TW, mu, WS, CLmax, AR, e=0.8, CDA=0.024, cdp=0.05):
+
+    g = 9.8
+    rho = 1.225
+    WS *= 47.8803
+
+    A = -g*(TW + mu)
+    CDg = CDA + cdp + CLmax**2/pi/AR/e
+    B = g*0.5*rho*1./WS*(CDg - mu*CLmax)
+    Vtd = 1.2*(2*WS/rho/CLmax)**0.5
+
+    if B > 0:
+        S = 1./2./B*log(1 - B/A*Vtd**2)
+    elif B < 0:
+        S = -1./2./B*log(A/(A - B*Vtd**2))
+
+    gload = 0.5*Vtd**2/g/S
+    S *= 3.28084
+
+    params = {"A": A, "B": B, "VTD": Vtd, "CDg": CDg, "S": S, "gload": gload}
+    return params
+
 if __name__ == "__main__":
-    ac = dummy()
-    M = Landing(ac)
-    M.cost = M["S_{land}"]
-    sol = M.localsolve("mosek")
-    print sol.table()
+    # ac = dummy()
+    # M = Landing(ac)
+    # M.cost = M["S_{land}"]
+    # sol = M.localsolve("mosek")
+    # print sol.table()
+
+    prms = gr_landing(TW=0, mu=0.5, WS=15, CLmax=4.0, AR=8)
+
     # ac = testAircraft()
     # M = Landing(ac)
     # M.cost = M["S_{land}"]
