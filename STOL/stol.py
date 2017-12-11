@@ -195,7 +195,7 @@ class GLanding(Model):
         constraints = [
             Sgr >= 0.5*fs["V"]**2/gload/g,
             Vstall == (2.*W/fs["\\rho"]/S/CLland)**0.5,
-            Slnd >= msafety*Sgr,
+            Slnd >= Sgr,
             fs["V"] >= fref*Vstall,
             Vref == fs["V"],
             ]
@@ -209,6 +209,7 @@ class Mission(Model):
     ---------
     Srunway             [ft]        runway length
     PFEI                [kJ/kg/km]  parameter of interest
+    msafety     1.4     [-]         safety margin
     """
     def setup(self, sp=False, costModel=False):
         exec parse_variables(Mission.__doc__)
@@ -235,16 +236,16 @@ class Mission(Model):
         Sto = self.takeoff.Sto
 
         constraints = [Pshaftmax >= Pshaft,
-                       Srunway >= Sto,
+                       Srunway >= msafety*Sto,
                        PFEI == hbatt*Wbatt/(R*Wpax*Npax)]
 
         if sp:
             self.landing = Landing(self.aircraft)
-            constraints.extend([Srunway >= self.landing.Slnd])
+            constraints.extend([Srunway >= msafety*self.landing.Slnd])
             self.mission.extend([self.landing])
         else:
             self.landing = GLanding(self.aircraft)
-            constraints.extend([Srunway >= self.landing.Slnd])
+            constraints.extend([Srunway >= msafety*self.landing.Slnd])
             self.mission.extend([self.landing])
 
         return constraints, self.aircraft, self.mission
@@ -273,7 +274,7 @@ class TakeOff(Model):
     Sto                     [ft]        take off distance
     Sground                 [ft]        ground roll
     etaprop     0.8         [-]         propellor efficiency
-    msafety     1.4         [-]         safety margin
+    fref        1.3         [-]         stall margin
 
     """
     def setup(self, aircraft, sp=False):
@@ -295,10 +296,10 @@ class TakeOff(Model):
             T <= Pshaftmax*etaprop/fs["V"],
             CDg >= 0.024 + cdp + CLto**2/pi/AR/e,
             Vstall == (2*W/fs["\\rho"]/S/CLto)**0.5,
-            fs["V"] == 1.3*Vstall,
+            fs["V"] == fref*Vstall,
             FitCS(fd, zsto, [A/g, B*fs["V"]**2/g]),
             Sground >= 1.0/2.0/B*zsto,
-            Sto/msafety >= Sground]
+            Sto >= Sground]
 
         if sp:
             with SignomialsEnabled():
@@ -324,17 +325,17 @@ def advanced(model):
     model.substitutions.update({
         model.cruise.R: 100, model.cruise.Vmin: 100, model.aircraft.hbatt: 300,
         model.Srunway: 200,
-        model.landing.msafety: 1.2,
-        model.takeoff.msafety: 1.2,
+        model.msafety: 1.2,
         model.aircraft.sp_motor: 7./9.81*0.8,
         model.landing.fref: 1.1,
+        model.takeoff.fref: 1.1,
         model.landing.gload: 0.5, model.takeoff.CLto: 5.0,
         model.landing.CLland: 4.5})
 
 if __name__ == "__main__":
     SP = False
     M = Mission(sp=SP)
-    M.substitutions.update({"R": 100, M.Srunway: 10000})
+    M.substitutions.update({M.cruise.R: 100, M.Srunway: 10000})
     M.cost = M[M.aircraft.W]
     #M.cost = M["Cost_per_trip"]
     if SP:
