@@ -61,7 +61,7 @@ def labelLine(line,x,label=None,align=True,**kwargs):
 
     ax.text(x,y,label,rotation=trans_angle,**kwargs)
 
-def labelLines(lines,align=True,xvals=None,zorder=[],**kwargs):
+def labelLines(lines,align=True,xvals=None,**kwargs):
 
     ax = lines[0].get_axes()
     labLines = []

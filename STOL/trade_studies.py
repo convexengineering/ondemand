@@ -310,7 +310,7 @@ def plot_sw_pay():
     fig.savefig("srunwpay.pdf", bbox_inches="tight")
 
 def plot_sw_mtow(model):
-    del model.substitutions["S_{runway}"]
+    del model.substitutions[model.Srunway]
 
     clrs = ["#084081", "#0868ac", "#2b8cbe", "#4eb3d3", "#7bccc4"]*5
     fig, ax = plt.subplots()
@@ -319,16 +319,16 @@ def plot_sw_mtow(model):
     pax = range(2,9)
     Npax = len(pax)
     for npax in pax:
-        model.substitutions.update({"W_{pay}": npax*195.})
-        model.cost = model["S_{runway}"]
+        model.substitutions.update({model.aircraft.Npax: npax})
+        model.cost = model[model.Srunway]
         sol = model.solve("mosek")
         model.cost = model.aircraft.topvar("W")
-        Smin = sol("S_{runway}").magnitude + 5
+        Smin = sol(model.Srunway).magnitude + 5
         Smax = 800
-        bst = autosweep_1d(model, 0.1, model["S_{runway}"], [Smin, Smax])
+        bst = autosweep_1d(model, 0.1, model[model.Srunway], [Smin, Smax])
         _x = np.linspace(Smin, Smax, 100)
-        sensland = bst.solarray["sensitivities"]["constants"]["C_{L_{land}}"]
-        xp = bst.solarray("S_{runway}").magnitude
+        sensland = bst.solarray["sensitivities"]["constants"][model.landing.CLland]
+        xp = bst.solarray(model.Srunway).magnitude
         f = interp1d(xp, sensland)
         sensland = f(_x)
         axs.plot(_x, sensland, c=clrs[i])
