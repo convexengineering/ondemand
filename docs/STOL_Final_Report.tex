@@ -425,29 +425,47 @@ Therefore, for runway lengths greater than 150 ft vehicle range, not runway dist
 These trade studies, done with simple models, show that there could likely be a realizable design of a short take off and landing vehicle that meets urban infrastructure requirements without a large penalty in performance.
 
 \section{Infrastructure}
-\begin{figure}[!htbp]
-\centering
-	\includegraphics[width=0.5\textwidth]{STOLport_300_nominal.eps}
-\caption{The layout of a notional short takeoff and landing area}
-\label{fig:stolport}
-
+Infrastructure is another aspect of the system that drives the vehicle design. A range of feasible runway lengths is a requirement that flows from infrastructure and in turn defines what vehicle designs are also feasible. As previously discussed, there is a substantial amount of airport infrastructure located outside of urban centers; however within an urban center, much less airport or runway infrastructure exists. Therefore this infrastructure study will specifically consider feasible infrastructure within an urban center. The city of Boston will be used for this case study. Key topics to address include what considerations drive the placement of STOLports, what are feasible location types, and how does infrastructure availability change with infrastructure type and required size. The goal in selecting locations for STOLport infrastructure is to be able to connect to existing transportation infrastructure within an urban center.
+\paragraph{Site Considerations}
+Site considerations are not driven solely by runway length. The minimum rectangular area upon which a STOLport can be built is defined by runway length as we well as room for taxiways, clearway requirements, and space for parking and charging stations. Clearway requirements are written in the FAA AC 150/5300 and are dependent on aircraft size and speed [1???]. For locations that may be space restricted, a STOLpad rather than a STOLport concept is possible, which would consist of only the bare minimum infrastructure and would not include space for considerations such as parking and charging stations. Site considerations are also dependent on VFR approach and departure paths and the need for obstacle avoidance. Obstacle avoidance is defined as a plane of a defined width at a given distance and height from the runway, through which no obstacle may protrude; obstacle avoidance definitions are also dependent on vehicle size and speed [1???]. The key drivers for site considerations are area available, which is more than solely runway length, and obstacle avoidance for approach and departure paths.
+\paragraph{Feasible Locations}
+A network of notional sites within Boston was designed with the previous considerations in mind. The network of notional sites is shown in Figure ~\ref{f:nsites}. Within the network there are four types of possible STOLport locations, which are also shown in Figure ~\ref{f:nsites}. The four types of locations to place a STOLport are on top of a building, over a highway or railway, on a barge over a body of water, or on the ground. Visualizations for the four types of STOLport locations are shown in Figure ~\ref{f:svis}. The barge location shows a runway and possible space for charging stations.  The highway or railway location shows a runway on an elevated structure, with a ramp for the aircraft to taxi down to a lower level with charging stations. The building location shows the possibility for crosswind runways depending on the are available, and space for charging stations are also shown. The ground location is similar to the building location with crosswind runways depending on the area available and charging stations again shown. The network of notional sites identified accounting for previously discussed considerations included building locations, highway or railway locations, barge locations, and ground locations.
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=1.0\textwidth]{2 Notional Sites.pdf}
+    \caption{\textbf{Notional sites for STOLport locations}}
+	\label{f:nsites}
+	\end{center}
 \end{figure}
-
-Figure ~\ref{fig:stolport} shows the layout of a notional STOLA for a 300ft runway length, taking into account current FAA guidance on runway clearance and centerline separation for runways and taxiways.  This assumes that the vehicles will have an approach reference speed of less than 50 kts.  This layout is notional and is affected by vehicle approach speed and wingspan. 
-
-A key part of the feasibility of an UAM concept is dual-use takeoff and landing areas (TOLA), whether for ESTOL or VTOL vehicles.   Due to the high value and scarcity of undeveloped urban real-estate, single-use UAM infrastructure is likely to be cost-prohibitive.  Considerations for various types of STOLAs are shown in Figure~\ref{fig:stola_key}, which has notional layouts for STOLAs over roads, railways, barges, and buildings. 
-\begin{figure}[!htbp]
-\centering
-	\includegraphics[width=1\textwidth]{STOLport_key.jpg}
-\caption{Notional STOLport layouts for various locations}
-\label{fig:stola_key}
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=1.0\textwidth]{3 STOLport Visualizations.pdf}
+    \caption{\textbf{STOLport placement options}}
+	\label{f:svis}
+	\end{center}
 \end{figure}
-Future work will lay out more fully the design constraints of a notional STOLA, how the throughput is constrained by various systemic factors (vehicle separation, charging time/infrastructure, ground access, passenger loading times), and how that is reflected in the vehicle design. 
-
-
-
+\paragraph{Scaling}
+Considerations for scaling an infrastructure network vary depending on the type of STOLport location. At highway and railway locations, placing any length of runway is fairly easy because the length of highways and railways far exceeds the length of STOLport runways; however the amount of above ground highway and railway infrastructure is limited in downtown areas due to tunnels. Many major cities are located by large bodies of water which allows for much area in order to scale the number of barge locations; however barges must consider ways to connect to the shore and avoiding shipping lanes. Scaling a network of ground infrastructure locations is not really feasible in an urban center aside from already existing airports. Buildings are generally widely available within an urban center, however buildings will require shorter runway lengths than some of the other locations. Building STOLport locations are the type of location that is most dependent on runway length.
+	In order to understand how building infrastructure varies with runway length, heat maps and histograms were created. Figure ~\ref{f:heatmap} shows heat maps for Boston and Los Angeles. The data used is GIS data and possible buildings were defined such that the building footprint had at least one dimension that was as long as the runway length [2,3]. The heat maps show that the possible buildings for different runway lengths are distributed throughout the city making it possible to scale an infrastructure network that is not all concentrated at one location. The building histograms in Figure ~\ref{f:hist} provide insight into how the number of available buildings varies with runway length. Runway lengths of approximately 400-600 feet do allow for a feasible number of building locations to design a network, and runway lengths of 300 feet or less allow for a significant increase in the number of possible building locations. The trend is that as runway length increases, the number of available buildings exponentially decreases.
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=1.0\textwidth]{4 Building Heat Maps.pdf}
+    \caption{\textbf{Notional sites for STOLport locations}}
+	\label{f:heatmap}
+	\end{center}
+\end{figure}
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=1.0\textwidth]{5 Building Histograms.pdf}
+    \caption{\textbf{STOLport placement options}}
+	\label{f:hist}
+	\end{center}
+\end{figure}
 
 \section{Conclusion}
+\paragraph{Infrastructure}
+Possible types of locations for STOLports identified in this study include on top of buildings, over highways and railways, on barges, or on the ground of existing airports. These locations can support runway lengths of 400 to 600 feet; if the STOL vehicle is able to land in a runway length of 300 feet or less, then the number of possible buildings significantly increases. Landing in a runway length of 500 feet or less could allow for novel operations at existing major airports. The results of the infrastructure study indicate that it is possible to design a STOLport network in an urban center.
+\paragraph{Risks Revisited}
 
 \bibliography{biblibrary}
 \bibliographystyle{aiaa}
