@@ -227,13 +227,14 @@ It is assumed that the aircraft is completely electric, replying on battery powe
 The aircraft weight is comprised of the battery, payload, wing, motor, and structural weight,
 
 \begin{equation}
-    W_{\mathrm{MTO}} \geq W_{\mathrm{batt}} + W_{\mathrm{pay}} + W_{\mathrm{wing}} + W_{\mathrm{motor}} + W_{\mathrm{struct}}
+    W_{\mathrm{MTO}} \geq W_{\mathrm{batt}} + N_{\mathrm{pax}}W_{\mathrm{pax}} + W_{\mathrm{wing}} + W_{\mathrm{motor}} + W_{\mathrm{struct}}
 \end{equation}
 
-where the motor and structural weights are
+where the motor, passenger, and structural weights are
 
 \begin{align}
     W_{\mathrm{motor}} &\geq \frac{P_{\mathrm{shaft-max}}}{P_{\mathrm{spec}}} \\
+    W_{\mathrm{pax}} &= 195 \mathrm{[lbf]} \\
     W_{\mathrm{struct}} &\geq W_{\mathrm{MTO}}f_{\mathrm{struct}}.
 \end{align}
 
@@ -324,14 +325,34 @@ with an average log error of 0.06\%.  The terms $A$, and $B$, are constrained by
 
 where the $\mu C_{L_g}$ term is neglected as a conservative approximation for $B$ to preserve GP-compatibility. 
 
-It is assumed that the primary constraint on landing is a comfortable deceleration for passengers.  
+The landing ground roll distance is calculated using conservation of energy, with the primary design variable being the loading deceleration factor, $N$.
 This constraint will drive the wing loading down. 
 
 \begin{equation}
     S_{\mathrm{land}} \geq \frac{1}{2} \frac{V^2}{Ng} 
 \end{equation}
 
-where $N$ is the acceleration factor such that $N=1$ corresponds to a 1-g deceleration. 
+where $N=1$ corresponds to a 1-g deceleration. 
+The deceleration factor is a function of the technologies used to stop the aircraft and include, but are not limited to: breaks, reverse thrust from electric motors, and drag.  
+To understand how the g-loading constant varies with different amounts of reverse thrust, the ground roll and deceleration factor are calculate for the X-57 as an example case. 
+Table~\ref{t:landingdecel} shows the deceleration loading factor for different amounts of reverse thrust. 
+
+\begin{table}[H]
+    \centering
+    \caption{Landing Case for the X-57}
+    \label{t:landingdecel}
+    \begin{tabular}{lcc}
+    \toprule
+    \toprule
+                                    & Ground          & Deceleration \\ 
+                                    & Roll Distance   & Factor ($N$)\\ \hline
+    Brakes only (dry)               &  925 [ft]       & 0.37  \\
+    Brakes + 10\% reverse thrust    &  850 [ft]       & 0.4   \\
+    Brakes + 50\% reverse thrust    &  625 [ft]       & 0.55  \\
+    Brakes + 100\% reverse thrust   &  425 [ft]       & 0.73  \\
+    \bottomrule
+\end{tabular}
+\end{table}
 
 For both the landing and takeoff constraints it is assumed that the velocity has a 20\% margin on the stall velocity,
 
@@ -339,6 +360,7 @@ For both the landing and takeoff constraints it is assumed that the velocity has
     V = 1.2V_{\mathrm{stall}} = \sqrt{\frac{2W_{\mathrm{MTO}}}{\rho S C_{L_{\mathrm{max}}}}}.
 \end{equation}
 
+It is assumed that the the max lift coefficient is different for landing and takeoff.
 Another 40\% margin is placed on the ground roll distance to determine runway length
 
 \begin{align}
@@ -359,22 +381,24 @@ Using the geometric programming model of a STOL aircraft perviously described, t
     \begin{tabular}{l c}
     \toprule
     \toprule
-    Parameter                                   & Value \\ \hline
-    $S_{\mathrm{runway}}$                       & 300 [ft] \\
-    $W_{\mathrm{pay}}$                          & 800 [lbf] \\
-    $\eta_{\mathrm{elec}}$                      & 0.9\\
-    $h_{\mathrm{batt}}$                         & 210 [Whr/kg]\\
+    Parameter                                   & Value         \\ \hline
+    $S_{\mathrm{runway}}$                       & 300 [ft]      \\
+    $\eta_{\mathrm{elec}}$                      & 0.9           \\
+    $h_{\mathrm{batt}}$                         & 210 [Whr/kg]  \\
     $P_{\mathrm{spec}}$                         & 0.7136 [kW/N] \\
-    $R$                                         & 100 [nmi] \\
-    $C_{L_{\mathrm{max}}}$                      & 3.5 [kts] \\
-    $\eta_{\mathrm{prop}}$                      & 0.8  \\
+    $R$                                         & 100 [nmi]     \\
+    $V_{\mathrm{min}}$                          & 100 [kts]     \\
+    $C_{L_{\mathrm{max}}}$ (Landing)            & 3.5           \\
+    $C_{L_{\mathrm{max}}}$ (TO)                 & 4.0           \\
+    $N$                                         & 0.3g          \\
+    $\eta_{\mathrm{prop}}$                      & 0.8           \\
     \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[H]
     \centering
-    \caption{Design Parameters}
+    \caption{Design Variables}
     \label{t:vars}
     \begin{tabular}{l c}
     \toprule
@@ -393,36 +417,104 @@ Using the geometric programming model of a STOL aircraft perviously described, t
 
 \end{multicols}
 
-To understand how range and runway requirements affect vehicle weight, the GP model was solved 30 times in 3.46 seconds.  The results are shown in Figure~\ref{f:mtowrangew}, each point on the graph corresponding to a unique optimization solution or vehicle size.  
-From this study it is observed that for runway lengths greater than about 350 ft, range is the constraining factor for vehicle weight.  
-Conversly, while extemely short runways may be possible, it would come at the cost of vehicle range. 
-
-\begin{figure}[h!]
-	\begin{center}
-	\includegraphics[width=0.6\textwidth]{mtowrangew.pdf}
-    \caption{\textbf{Trade space of aircraft weight, range and runway length.}}
-	\label{f:mtowrangew}
-	\end{center}
-\end{figure}
-
-Another way to view this trade space is to understand how runway length and range trade for different max lift coefficients.  
-Blow wings, highly cambered airfoils, or deflected wing surfaces can act to achieve higher max lift coefficients.  
-Because the max lift coefficient for landing and takeoff may be different two separate studies were done, trading runway distance and vehicle range for different max lift coefficients, shown in Figure~\ref{f:rangetod}.  
-Figure~\ref{f:rangetodclto} shows that higher lift coefficients on takeoff have little effect on the range of the aircraft.  
-This is because the aircraft is constrained by the landing model and not the take off model.  
-In Figure~\ref{f:rangetodclland}, the differenet lift coefficient lines converge around runway lengths of 150 ft.  
-Therefore, for runway lengths greater than 150 ft vehicle range, not runway distance, becomes the driving requirement. 
+To understand how passenger and runway requirements affect vehicle weight, the GP model was solved 30 times in 3.46 seconds.  
+The results are shown in Figure~\ref{f:sw_mtow}, each point on the graph corresponding to a unique optimization solution or vehicle size.  
+From this study it is observed that for runway lengths shorter than 250 ft are near infeasible for this set of parameters.  
+It is also oberserved that the runway length is fairly insenstive to number of passengers.  
 
 \begin{figure}[h!]
  \begin{subfigmatrix}{2}% number of columns
-     \subfigure[\label{f:rangetodclto}]{\includegraphics[]{rangetodclto.pdf}}
-     \subfigure[\label{f:rangetodclland}]{\includegraphics[]{rangetodclland.pdf}}
+     \subfigure[\label{f:sw_mtow}Contours of number of passengers]{\includegraphics[]{sw_mtow.pdf}}
+     \subfigure[\label{f:sw_mtowsens}Sensitivity to landing constraints]{\includegraphics[]{sw_mtowsens.pdf}}
  \end{subfigmatrix}
- \caption{\textbf{Runway distance versus range for different maximum lift coefficients. }}
+    \caption{\textbf{Trade space of aircraft weight, number of passengers and runway length.}}
+ \label{f:sw_mt}
+\end{figure}
+
+By looking at the sensitivity to the lift coefficient, shown in figure~\ref{f:sw_mtowsens}, on landing for the same trade study shown in figure~\ref{f:sw_mtow}, it can be determined whether the aircraft is constrained by the landing constraints or the take off constraints. 
+The sensitivity to a variable in a geometric program is defined as the percentage change in the objective function for a 1\% change in that variable's value.  
+For this study, either the landing constraints or the take off constraints will be active or driving the size of the vehicle.  
+Thus, if the sensitivity to the lift coefficient on landing is zero, then the landing constraints are not active. 
+Conversly, if the sensitivity is non-zero then those constraints are active and the vehicle size is landing constrained. 
+
+Another way to view this trade space is to understand how runway length and range are effected by different minimum speed requirements.  
+Figure~\ref{f:minspeed} shows plots of minimum cruise speed vs max take off weight for different contours of runway length and range requirements.  
+This trade study was done for 5 passengers.  
+These plots show that short runway and longer range requirements are possible but require slower cruise speeds.  
+Because power scales with velocity cubed, slower speed reduces the required power and therefore battery weight, which improves the whole system. 
+Note that in both plots shown in figure~\ref{f:minspeed}, lowering the minimum speed does not always improve the vehicle weight.  
+A flat curve indicates that the aircraft is not constrained by the minimum cruise speed because of the optimum cruise speed for that set of requirements is faster than the minimum cruise speed. 
+
+\begin{figure}[h!]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[\label{f:vweightR}Contours of range]{\includegraphics[]{vweightR.pdf}}
+     \subfigure[\label{f:vweightS}Contours of runway length]{\includegraphics[]{vweightS.pdf}}
+ \end{subfigmatrix}
+ \caption{\textbf{Trade study between requirements of runway length, minimum speed and range.}}
  \label{f:rangetod}
 \end{figure}
 
-These trade studies, done with simple models, show that there could likely be a realizable design of a short take off and landing vehicle that meets urban infrastructure requirements without a large penalty in performance.
+\subsection{Advanced Technology Trade Studies}
+
+The previous section showed fundamental trade studies and trends for how runway length varies with performance.  
+It is also possible to shorten runway length through advanced technology. 
+As disscussed previously, a number of technologies could help reduce the required runway length including power bursts from electric motors, reverse thrust on landing, advanced flight controls, and improved battery technology.  
+The effect of these technology advances on required runway length can be observed by changing a few parameters from the baseline case and resolving the optimization model.
+Table~\ref{t:techparams} compares the baseline parameters to the advanced technology parameters that were assumed in the optimization model. 
+
+\begin{table}[H]
+    \centering
+    \caption{Advanced Technology Parameter Assumptions}
+    \label{t:techparams}
+    \begin{tabular}{l c c}
+    \toprule
+    \toprule
+    Parameter                         & Baseline Value  & Advanced Value \\ \hline
+    $h_{\mathrm{batt}}$               & 210 [Whr/kg]    & 300 [Whr/kg]   \\
+    $P_{\mathrm{spec}}$               & 0.7136 [kW/N]   & 0.571 [kW/N]   \\
+    $C_{L_{\mathrm{max}}}$ (Landing)  & 3.5             & 4.5            \\
+    $C_{L_{\mathrm{max}}}$ (TO)       & 4.0             & 5.0            \\
+    $N$                               & 0.3             & 0.5            \\
+    Runway margin                     & 40\%            & 20\%           \\
+    Stall speed margin                & 30\%            & 10\%           \\
+    \bottomrule
+\end{tabular}
+\end{table}
+
+The motor power to weight ratio was lowered to take credit for the electric motor power burst during take off and is 80\% of the baseline value. 
+The maximum lift coefficient during landing and takeoff were increased to match values predicted by NASA.
+The landing deceleration factor was increased to take credit for use of reverse thrust on landing.
+The lower margins on the runway length and stall speed are assuming advanced flight controls that require less margin. 
+Realistically achieving all of these advances in a STOL aircraft design is unlikely.  
+However, understanding the extremes between the baseline, conservative case and a more optimistic case is useful in determining a feasible vehicle design and vehicle requirements. 
+Figure~\ref{f:sw_mtt} shows the same trade study as figure~\ref{f:sw_mt}, but with the updated parameter values shown in Table~\ref{t:techparams}.
+
+\begin{figure}[h!]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[\label{f:sw_mtowt}Contours of number of passengers]{\includegraphics[]{sw_mtowt.pdf}}
+     \subfigure[\label{f:sw_mtowtsens}Sensitivity to landing constraints]{\includegraphics[]{sw_mtowtsens.pdf}}
+ \end{subfigmatrix}
+    \caption{\textbf{Trade space of aircraft weight, number of passengers and runway length for advanced technology assumptions.}}
+ \label{f:sw_mtt}
+\end{figure}
+
+As observed in figure~\ref{f:sw_mtowt}, the advanced techonology assumptions allow for a much shorter runway than the baseline case showing that runways below even 100 ft might be possible. 
+To understand which parameters have the largest effect on this trade study, each parameter can be varied one at a time from the baseline case. 
+Figure~\ref{f:tech} show variations on the 5 passenger contour from figure~\ref{f:sw_mtow}. 
+
+\begin{figure}[h!]
+ \begin{subfigmatrix}{3}% number of columns
+     \subfigure[\label{f:smtow_clmax}Contours of $C_{L_{\mathrm{max}}}$]{\includegraphics[]{smtow_clmax.pdf}}
+     \subfigure[\label{f:smtow_gl}Contours of deceleration factor]{\includegraphics[]{smtow_gl.pdf}}
+     \subfigure[\label{f:smtow_hbatt}Contours of battery specific energy]{\includegraphics[]{smtow_hbatt.pdf}}
+ \end{subfigmatrix}
+    \caption{\textbf{Trade space of aircraft weight, number of passengers and runway length for advanced technology assumptions.}}
+ \label{f:tech}
+\end{figure}
+
+Note that increasing the maximum lift coefficient or the deceleration factor has no effect for higher runway lengths.  
+This is because at higher runway lengths the size of the aicraft is constained by the range requirement but not the runway requirement. 
+Increasing the battery specific energy however, is always beneficial because that lowers the battery weight which improves the whole system. 
 
 \section{Infrastructure}
 \begin{figure}[!htbp]
