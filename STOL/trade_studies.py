@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
-from stol import Mission
+from plotting import labelLines
+from stol import Mission, baseline, advanced
 from gpkit.tools import autosweep_1d
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size':19})
@@ -308,46 +309,46 @@ def plot_sw_pay():
     ax.set_ylabel("Number of Passengers")
     fig.savefig("srunwpay.pdf", bbox_inches="tight")
 
-def plot_sw_mtow():
-    M = Mission(sp=False)
-    M.substitutions.update({"R": 100, "V_{min}": 100,
-                            "g_{loading}": 0.3, "C_{L_{TO}}": 4.0,
-                            "C_{L_{land}}": 3.5})
+def plot_sw_mtow(model):
+    del model.substitutions["S_{runway}"]
 
     clrs = ["#084081", "#0868ac", "#2b8cbe", "#4eb3d3", "#7bccc4"]*5
     fig, ax = plt.subplots()
-    fig2, ax2 = plt.subplots()
+    fis, axs = plt.subplots()
     i = 0
-    for npax in range(2, 9):
-        M.substitutions.update({"W_{pay}": npax*195.})
-        M.cost = M["S_{runway}"]
-        sol = M.solve("mosek")
-        M.cost = M.aircraft.topvar("W")
+    pax = range(2,9)
+    Npax = len(pax)
+    for npax in pax:
+        model.substitutions.update({"W_{pay}": npax*195.})
+        model.cost = model["S_{runway}"]
+        sol = model.solve("mosek")
+        model.cost = model.aircraft.topvar("W")
         Smin = sol("S_{runway}").magnitude + 5
         Smax = 800
-        bst = autosweep_1d(M, 0.1, M["S_{runway}"], [Smin, Smax])
+        bst = autosweep_1d(model, 0.1, model["S_{runway}"], [Smin, Smax])
         _x = np.linspace(Smin, Smax, 100)
         sensland = bst.solarray["sensitivities"]["constants"]["C_{L_{land}}"]
         xp = bst.solarray("S_{runway}").magnitude
         f = interp1d(xp, sensland)
         sensland = f(_x)
-        ax2.plot(_x, sensland, c=clrs[i])
-        pay = bst.sample_at(_x)(M.aircraft.topvar("W"))
-        ax.plot(_x, pay, c=clrs[i], lw=2)
+        axs.plot(_x, sensland, c=clrs[i])
+        pay = bst.sample_at(_x)(model.aircraft.topvar("W"))
+        ax.plot(_x, pay, c=clrs[i], lw=2, label="%d" % npax)
         i += 1
 
     ax.grid()
     ax.set_ylim([0, 8000])
     ax.set_xlim([0, 800])
+    labelLines(ax.lines, align=False, xvals=[400]*Npax, fontsize=12)
     ax.set_xlabel("Runway Length [ft]")
     ax.set_ylabel("Max Take Off Weight [lbs]")
-    fig.savefig("sw_mtow.pdf", bbox_inches="tight")
 
-    ax2.set_ylabel("Sensitivity to CLmax")
-    ax2.grid()
-    ax2.set_xlim([0, 800])
-    ax2.set_xlabel("Runway Length [ft]")
-    fig2.savefig("sw_mtowsens.pdf", bbox_inches="tight")
+    axs.set_ylabel("Sensitivity to CLmax")
+    axs.grid()
+    axs.set_xlim([0, 800])
+    axs.set_xlabel("Runway Length [ft]")
+
+    return fig, fis
 
 def plot_rangev():
     M = Mission(sp=False)
@@ -497,59 +498,23 @@ def plot_gl():
     ax.set_ylabel("Max Take Off Weight [lbs]")
     fig.savefig("smtow_gl.pdf", bbox_inches="tight")
 
-def plot_sw_mtowtech():
-    M = Mission(sp=False)
-    M.substitutions.update({"R": 100, "V_{min}": 100, "h_{batt}": 300,
-                            "m_{fac}_Mission/GLanding": 1.2,
-                            "m_{fac}_Mission/TakeOff": 1.2,
-                            "sp_{motor}": 7./9.81*0.8,
-                            "f_{ref}": 1.1,
-                            "g_{loading}": 0.5, "C_{L_{TO}}": 5.0,
-                            "C_{L_{land}}": 4.5})
-
-    clrs = ["#084081", "#0868ac", "#2b8cbe", "#4eb3d3", "#7bccc4"]*5
-    fig, ax = plt.subplots()
-    fig2, ax2 = plt.subplots()
-    i = 0
-    for npax in range(2, 9):
-        M.substitutions.update({"W_{pay}": npax*195.})
-        M.cost = M["S_{runway}"]
-        sol = M.solve("mosek")
-        M.cost = M.aircraft.topvar("W")
-        Smin = sol("S_{runway}").magnitude + 5
-        Smax = 800
-        bst = autosweep_1d(M, 0.1, M["S_{runway}"], [Smin, Smax])
-        _x = np.linspace(Smin, Smax, 100)
-        sensland = bst.solarray["sensitivities"]["constants"]["C_{L_{land}}"]
-        xp = bst.solarray("S_{runway}").magnitude
-        f = interp1d(xp, sensland)
-        sensland = f(_x)
-        ax2.plot(_x, sensland, c=clrs[i])
-        pay = bst.sample_at(_x)(M.aircraft.topvar("W"))
-        ax.plot(_x, pay, c=clrs[i], lw=2)
-        i += 1
-
-    ax.grid()
-    ax.set_ylim([0, 8000])
-    ax.set_xlim([0, 800])
-    ax.set_xlabel("Runway Length [ft]")
-    ax.set_ylabel("Max Take Off Weight [lbs]")
-    fig.savefig("sw_mtowt.pdf", bbox_inches="tight")
-
-    ax2.set_ylabel("Sensitivity to landing constraints")
-    ax2.grid()
-    ax2.set_xlabel("Runway Length [ft]")
-    fig2.savefig("sw_mtowtsens.pdf", bbox_inches="tight")
-
 if __name__ == "__main__":
     # plot_runway()
-    plot_vminS()
+    # plot_vminS()
     # plot_vminR()
     # plot_cost()
     # plot_costS()
     # plot_CLmax()
     # plot_vminWp()
-    # plot_sw_mtow()
+    M = Mission(sp=False)
+    baseline(M)
+    fig, fis = plot_sw_mtow(M)
+    fig.savefig("sw_mtow.pdf", bbox_inches="tight")
+    fis.savefig("sw_mtowsens.pdf", bbox_inches="tight")
+    advanced(M)
+    fig, fis = plot_sw_mtow(M)
+    fig.savefig("sw_mtowt.pdf", bbox_inches="tight")
+    fis.savefig("sw_mtowtsens.pdf", bbox_inches="tight")
     # plot_rangev()
     # plot_smtow_clmax()
     # plot_hbatt()

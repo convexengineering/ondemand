@@ -256,6 +256,25 @@ class TakeOff(Model):
 
         return constraints, fs
 
+def baseline(model):
+    " sub in baseline parameters "
+    model.substitutions.update({
+        "R": 100, "S_{runway}": 400, "V_{min}": 100,
+        "W_{pay}": 5.*195, "g_{loading}": 0.3, "C_{L_{TO}}": 4.0,
+        "C_{L_{land}}": 3.5})
+
+def advanced(model):
+    " sub in advanced tech params "
+    model.substitutions.update({
+        "R": 100, "V_{min}": 100, "h_{batt}": 300,
+        "S_{runway}": 200,
+        "m_{fac}_Mission/GLanding": 1.2,
+        "m_{fac}_Mission/TakeOff": 1.2,
+        "sp_{motor}": 7./9.81*0.8,
+        "f_{ref}": 1.1,
+        "g_{loading}": 0.5, "C_{L_{TO}}": 5.0,
+        "C_{L_{land}}": 4.5})
+
 if __name__ == "__main__":
     SP = False
     M = Mission(sp=SP)
@@ -268,20 +287,9 @@ if __name__ == "__main__":
         sol = M.solve("mosek")
     print sol.table()
 
-    M.substitutions.update({"R": 100, "S_{runway}": 400, "V_{min}": 100,
-        "W_{pay}": 5.*195, "g_{loading}": 0.3, "C_{L_{TO}}": 4.0,
-        "C_{L_{land}}": 3.5})
+    baseline(M)
+    solbase = M.solve("mosek")
 
-    sol = M.solve("mosek")
-
-    # M.substitutions.update({"R": 100, "V_{min}": 100, "h_{batt}": 300,
-    #                         "S_{runway}": 200,
-    #                         "m_{fac}_Mission/GLanding": 1.2,
-    #                         "m_{fac}_Mission/TakeOff": 1.2,
-    #                         "sp_{motor}": 7./9.81*0.8,
-    #                         "f_{ref}": 1.1,
-    #                         "g_{loading}": 0.5, "C_{L_{TO}}": 5.0,
-    #                         "C_{L_{land}}": 4.5})
-
-    # sol = M.solve("mosek")
+    advanced(M)
+    soladv = M.solve("mosek")
 
