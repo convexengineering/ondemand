@@ -99,8 +99,8 @@ if __name__ == "__main__":
     ax.set_xlim([20, 160])
     ax.fill_between([20, 90], 0, 8000, facecolor="None", edgecolor="k",
                     hatch="/", lw=1)
-    ax.text(40, 1300, "$V \geq V_{\mathrm{min}}$\n inactive", ha="center")
-    ax.text(110, 1300, "$V \geq V_{\mathrm{min}}$\n active", ha="center")
+    ax.text(40, 1300, "$V_{\mathrm{cruise}} \geq V_{\mathrm{min}}$\n inactive", ha="center")
+    ax.text(110, 1300, "$V_{\mathrm{cruise}} \geq V_{\mathrm{min}}$\n active", ha="center")
     fig.savefig(path + "vweightR.pdf", bbox_inches="tight")
     baseline(M)
     fig, ax = plot_trade(M, minx=False, xvar=M.cruise.Vmin, xex=1,
@@ -113,8 +113,8 @@ if __name__ == "__main__":
     ax.set_xlim([20, 180])
     ax.fill_between([20, 60], 0, 8000, facecolor="None", edgecolor="k",
                     hatch="/", lw=1)
-    ax.text(40, 1300, "$V \geq V_{\mathrm{min}}$\n inactive", ha="center")
-    ax.text(80, 1300, "$V \geq V_{\mathrm{min}}$\n active", ha="center")
+    ax.text(40, 1300, "$V_{\mathrm{cruise}} \geq V_{\mathrm{min}}$\n inactive", ha="center")
+    ax.text(80, 1300, "$V_{\mathrm{cruise}} \geq V_{\mathrm{min}}$\n active", ha="center")
     fig.savefig(path + "vweightS.pdf", bbox_inches="tight")
     baseline(M)
     fig, _ = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,

@@ -271,7 +271,7 @@ Advances in flight control development allow precise control of vehicles on land
     \midrule
           &       &  \\
     \end{tabular}%
-  \label{tab:addlabel}%
+  \label{t:techtable}%
 \end{table}%
 
 
@@ -424,7 +424,7 @@ For both the landing and takeoff constraints it is assumed that the velocity has
 
 \begin{equation}
     \label{e:stall}
-    V = 1.2V_{\mathrm{stall}} = \sqrt{\frac{2W_{\mathrm{MTO}}}{\rho S C_{L_{\mathrm{max}}}}}.
+    V_{\mathrm{TD,TO}} = 1.2V_{\mathrm{stall}} = \sqrt{\frac{2W_{\mathrm{MTO}}}{\rho S C_{L_{\mathrm{max}}}}}.
 \end{equation}
 
 It is assumed that the the max lift coefficient is different for landing and takeoff.
@@ -440,8 +440,6 @@ Another 40\% margin is placed on the ground roll distance to determine runway le
 Using the geometric programming model of a STOL aircraft perviously described, tradeoffs between runway length and vehicle performance were evaulated.  The models consists of a 105 free variables and can be solved in approximately 0.1 seconds. 
 Because aircraft scales with aircraft weight as a first order approximation, the objective function throughout is to minimize weight, $\min{(W_{\mathrm{MTO}})}$. 
 Key parameters are defined in Table~\ref{t:params}.
-
-\begin{multicols}{2}
 
 \begin{table}[H]
     \centering
@@ -464,9 +462,6 @@ Key parameters are defined in Table~\ref{t:params}.
     \bottomrule
 \end{tabular}
 \end{table}
-
-
-\end{multicols}
 
 To understand how passenger and runway requirements affect vehicle weight, the GP model was solved 30 times in 3.46 seconds.  
 The results are shown in Figure~\ref{f:sw_mtow}, each point on the graph corresponding to a unique optimization solution or vehicle size.  
@@ -511,7 +506,7 @@ Because of the low wing loading required by the takeoff and landing models, the 
 Therefore, a minimum cruise speed requirement is imposed in the model
 
 \begin{equation}
-    V \geq V_{\mathrm{min}}.
+    V_{\mathrm{cruise}} \geq V_{\mathrm{min}}.
 \end{equation}
 
 The minimum speed requirement affects the amount of power draw and consequently the amount of batteries needed.  
@@ -536,33 +531,29 @@ The previous section showed fundamental trade studies and trends for how runway 
 It is also possible to shorten runway length through advanced technology. 
 As disscussed previously, a number of technologies could help reduce the required runway length including power bursts from electric motors, reverse thrust on landing, advanced flight controls, and improved battery technology.  
 The effect of these technology advances on required runway length can be observed by changing a few parameters from the baseline case and resolving the optimization model.
-Table~\ref{t:techparams} compares the baseline parameters to the advanced technology parameters that were assumed in the optimization model. 
+Table~\ref{t:techparams} compares the conservative parameters to the aggressive technology parameters that were assumed in the optimization model based off of the technologies discuessed in Table~\ref{t:techtable}. 
 
 \begin{table}[H]
     \centering
     \caption{Advanced Technology Parameter Assumptions}
     \label{t:techparams}
-    \begin{tabular}{l c c}
+    \begin{tabular}{l l c c}
     \toprule
     \toprule
-    Parameter                         & Baseline Value  & Advanced Value \\ \hline
-    $h_{\mathrm{batt}}$               & 210 [Whr/kg]    & 300 [Whr/kg]   \\
-    $(P/W)_{\mathrm{motor}}$          & 0.7136 [kW/N]   & 0.571 [kW/N]   \\
-    $C_{L_{\mathrm{max}}}$ (Landing)  & 3.5             & 4.5            \\
-    $C_{L_{\mathrm{max}}}$ (TO)       & 4.0             & 5.0            \\
-    Decleration Factor                & 0.4             & 0.7            \\
-    Runway margin                     & 40\%            & 20\%           \\
-    Stall speed margin                & 30\%            & 10\%           \\
+    Technology                  & Parameter                         & Conservative Value  & Aggressive Value \\ \hline
+    Battery improvements        & $h_{\mathrm{batt}}$               & 210 [Whr/kg]        & 300 [Whr/kg]     \\
+    Motor power burst           & $(P/W)_{\mathrm{motor}}$          & 0.7136 [kW/N]       & 0.571 [kW/N]     \\
+    Blown wing                  & $C_{L_{\mathrm{max}}}$ (Landing)  & 3.5                 & 4.5              \\
+    Blown wing                  & $C_{L_{\mathrm{max}}}$ (TO)       & 4.0                 & 5.0              \\
+    Reverse thrust              & Decleration Factor                & 0.4                 & 0.7              \\
+    Advanced flight controls    & Runway margin                     & 40\%                & 20\%             \\
+    Advanced flight controls    & Stall speed margin                & 30\%                & 10\%             \\
     \bottomrule
 \end{tabular}
 \end{table}
 
-The motor power to weight ratio was lowered to take credit for the electric motor power burst during take off and is 80\% of the baseline value. 
-The maximum lift coefficient during landing and takeoff were increased to match values predicted by NASA.
-The landing deceleration factor was increased to take credit for use of reverse thrust on landing.
-The lower margins on the runway length and stall speed are assuming advanced flight controls that require less margin. 
-Realistically achieving all of these advances in a STOL aircraft design is unlikely.  
-However, understanding the extremes between the baseline, conservative case and a more optimistic case is useful in determining a feasible vehicle design and vehicle requirements. 
+Realistically not all of these advances could be achieved in a STOL aircraft.  
+However, understanding the extremes between the conservative case and a more aggressive case is useful in determining a feasible vehicle design and vehicle requirements. 
 Figure~\ref{f:sw_mtt} shows the same trade study as figure~\ref{f:sw_mt}, but with the updated parameter values shown in Table~\ref{t:techparams}.
 
 \begin{figure}[h!]
@@ -592,27 +583,46 @@ Note that increasing the maximum lift coefficient or the deceleration factor has
 This is because at higher runway lengths the size of the aicraft is constained by the range requirement but not the runway requirement. 
 Increasing the battery specific energy however, is always beneficial because that lowers the battery weight which improves the whole system. 
 
-<<<<<<< HEAD
 \subsection{Point of Departure Vehicle}
+
+A ``point of departure'' vehicle was sized for both the conservative case and aggressive case, whose parameter values are listed in Table~\ref{t:techparams}.  
+Key variable values for both solutions are listed in Table~\ref{t:pod}.
 
 \begin{table}[H]
     \centering
     \caption{Design Variables}
-    \label{t:vars}
+    \label{t:pod}
     \begin{tabular}{l c}
     \toprule
     \toprule
-    Parameter                                   & Value \\ \hline
-    $W_{\mathrm{MTO}}$                          & 1496 [lbf] \\
-    $W_{\mathrm{batt}}$                         & 278 [lbf] \\
-    $W_{\mathrm{wing}}$                         & 53 [lbf] \\
-    $AR$                                        & 9 \\
-    $b$                                         & 22.3 [ft] \\
-    $V_{\mathrm{stall}}$                        & 48 [kts] \\
-    $(W/S)$                                     & 27 [lbf/ft$^2$] \\
+    Parameter                   & Conservative Case  & Aggressive Case \\ \hline
+    $W_{\mathrm{MTO}}$          & 2633 [lbf]         & 2010 [lbf] \\
+    $W_{\mathrm{batt}}$         & 873 [lbf]          & 460 [lbf] \\
+    $N_{\mathrm{pax}}$          & 5                  & 5  \\
+    $AR$                        & 11                 & 10 \\
+    $b$                         & 40 [ft]            & 30 [ft] \\
+    $(W/S)$                     & 18 [lbf/ft$^2$]    & 23 [lbf/ft$^2$] \\
+    $S_{\mathrm{runway}}$       & 400 [ft]           & 200 [ft] \\
     \bottomrule
 \end{tabular}
 \end{table}
+
+One significant advantage this aicraft offers over an electric VTOL vehicle is the capacity to carry more passengers.  The proposed vehicle can carry 5 passengers, while electric VTOL vehicles are typically limited to 2.  
+it is also noted that the runway length for the conservative case is 400 ft but runway lengths as short as 300 ft may be possible assuming some of the advanced technology is used. 
+This information can be used to inform infrastructure decisions.  
+Runway lengths need to be at least 400 ft, but could be as short has 300 ft if infrastructure availability improves for shorter runways. 
+
+Figure~\ref{f:vehicle} shows a visualization of the point of departure vehicle.  
+The design features a distributed electric propulsion system.  
+Additionally, all the batteries are able to fit wings allowing for simplier fuselage configurations. 
+
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=0.9\textwidth]{PICUTREOFAIRCRAFT.jpg}
+    \caption{\textbf{Proposed STOL vehicle.}}
+	\label{f:vehicle}
+	\end{center}
+\end{figure}
 
 \section{Infrastructure Feasibility}
 Infrastructure is another aspect of the system that drives the vehicle design. A range of feasible runway lengths is a requirement that flows from infrastructure and in turn defines what vehicle designs are also feasible. As previously discussed, there is a substantial amount of airport infrastructure located outside of urban centers; however within an urban center, much less airport or runway infrastructure exists. Therefore this infrastructure study will specifically consider feasible infrastructure within an urban center. The city of Boston will be used for this case study. Key topics to address include what considerations drive the placement of STOLports, what are feasible location types, and how does infrastructure availability change with infrastructure type and required size. The goal in selecting locations for STOLport infrastructure is to be able to connect to existing transportation infrastructure within an urban center.
