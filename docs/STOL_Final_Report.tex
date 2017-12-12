@@ -492,7 +492,7 @@ This argument implies that the landing model would constrain the vehicle size.
 
 \begin{figure}[h!]
 	\begin{center}
-	\includegraphics[width=0.9\textwidth]{to_land_arg.pdf}
+	\includegraphics[width=0.7\textwidth]{to_land_arg.pdf}
     \caption{\textbf{Effect of thrust to weight and wing loading ratios on vehicle size.}}
 	\label{f:to_land_arg}
 	\end{center}
@@ -557,7 +557,6 @@ Table~\ref{t:techparams} compares the conservative parameters to the aggressive 
 \end{tabular}
 \end{table}
 
-Realistically not all of these advances could be achieved in a STOL aircraft.  
 However, understanding the extremes between the conservative case and a more aggressive case is useful in determining a feasible vehicle design and vehicle requirements. 
 Figure~\ref{f:sw_mtt} shows the same trade study as figure~\ref{f:sw_mt}, but with the updated parameter values shown in Table~\ref{t:techparams}.
 
@@ -597,7 +596,7 @@ Key variable values for both solutions are listed in Table~\ref{t:pod}.
     \centering
     \caption{Design Variables}
     \label{t:pod}
-    \begin{tabular}{l c}
+    \begin{tabular}{l c c}
     \toprule
     \toprule
     Parameter                   & Conservative Case  & Aggressive Case \\ \hline
@@ -622,12 +621,13 @@ The design features a distributed electric propulsion system.
 Additionally, all the batteries are able to fit wings allowing for simplier fuselage configurations. 
 
 \begin{figure}[h!]
-	\begin{center}
-	\includegraphics[width=0.9\textwidth]{PICUTREOFAIRCRAFT.jpg}
-    \caption{\textbf{Proposed STOL vehicle.}}
-	\label{f:vehicle}
-	\end{center}
-\end{figure}
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[\label{f:sw_mtowt}]{\includegraphics[]{bottom_view_grey_bg.pdf}}
+     \subfigure[\label{f:sw_mtowtsens}]{\includegraphics[]{iso_view_transparent_wing.pdf}}
+ \end{subfigmatrix}
+    \caption{\textbf{Point of departure vehicle drawing.}}
+ \label{f:vehicle}
+ \end{figure}
 
 \section{Infrastructure Feasibility}
 Infrastructure is another aspect of the system that drives the vehicle design. A range of feasible runway lengths is a requirement that flows from infrastructure and in turn defines what vehicle designs are also feasible. As previously discussed, there is a substantial amount of airport infrastructure located outside of urban centers; however within an urban center, much less airport or runway infrastructure exists. Therefore this infrastructure study will specifically consider feasible infrastructure within an urban center. The city of Boston will be used for this case study. Key topics to address include what considerations drive the placement of STOLports, what are feasible location types, and how does infrastructure availability change with infrastructure type and required size. The goal in selecting locations for STOLport infrastructure is to be able to connect to existing transportation infrastructure within an urban center.
