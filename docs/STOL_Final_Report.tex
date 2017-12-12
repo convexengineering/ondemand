@@ -298,7 +298,7 @@ The aircraft weight is comprised of the battery, payload, wing, motor, and struc
 where the motor, passenger, and structural weights are
 
 \begin{align}
-    W_{\mathrm{motor}} &\geq \frac{P_{\mathrm{shaft-max}}}{P_{\mathrm{spec}}} \\
+    W_{\mathrm{motor}} &\geq \frac{P_{\mathrm{shaft-max}}}{(P/W)_{\mathrm{motor}}} \\
     W_{\mathrm{pax}} &= 195 \mathrm{[lbf]} \\
     W_{\mathrm{struct}} &\geq W_{\mathrm{MTO}}f_{\mathrm{struct}}.
 \end{align}
@@ -394,6 +394,7 @@ The landing ground roll distance is calculated using conservation of energy, wit
 This constraint will drive the wing loading down. 
 
 \begin{equation}
+    \label{e:sgr}
     S_{\mathrm{land}} \geq \frac{1}{2} \frac{V^2}{Ng} 
 \end{equation}
 
@@ -422,6 +423,7 @@ Table~\ref{t:landingdecel} shows the deceleration loading factor for different a
 For both the landing and takeoff constraints it is assumed that the velocity has a 20\% margin on the stall velocity,
 
 \begin{equation}
+    \label{e:stall}
     V = 1.2V_{\mathrm{stall}} = \sqrt{\frac{2W_{\mathrm{MTO}}}{\rho S C_{L_{\mathrm{max}}}}}.
 \end{equation}
 
@@ -435,7 +437,9 @@ Another 40\% margin is placed on the ground roll distance to determine runway le
 
 \subsection{Vehicle Trade Studies}
 
-Using the geometric programming model of a STOL aircraft perviously described, tradeoffs between runway length and vehicle performance were evaulated.  The models consists of a 105 free variables and was solved in 0.114 seconds with an objective function to minimize weight, $\min{(W_{\mathrm{MTO}})}$. Key parameters are defined in Table~\ref{t:params} and important solution variables are shown in Table~\ref{t:vars}.
+Using the geometric programming model of a STOL aircraft perviously described, tradeoffs between runway length and vehicle performance were evaulated.  The models consists of a 105 free variables and can be solved in approximately 0.1 seconds. 
+Because aircraft scales with aircraft weight as a first order approximation, the objective function throughout is to minimize weight, $\min{(W_{\mathrm{MTO}})}$. 
+Key parameters are defined in Table~\ref{t:params}.
 
 \begin{multicols}{2}
 
@@ -461,24 +465,6 @@ Using the geometric programming model of a STOL aircraft perviously described, t
 \end{tabular}
 \end{table}
 
-\begin{table}[H]
-    \centering
-    \caption{Design Variables}
-    \label{t:vars}
-    \begin{tabular}{l c}
-    \toprule
-    \toprule
-    Parameter                                   & Value \\ \hline
-    $W_{\mathrm{MTO}}$                          & 1496 [lbf] \\
-    $W_{\mathrm{batt}}$                         & 278 [lbf] \\
-    $W_{\mathrm{wing}}$                         & 53 [lbf] \\
-    $AR$                                        & 9 \\
-    $b$                                         & 22.3 [ft] \\
-    $V_{\mathrm{stall}}$                        & 48 [kts] \\
-    $(W/S)$                                     & 27 [lbf/ft$^2$] \\
-    \bottomrule
-\end{tabular}
-\end{table}
 
 \end{multicols}
 
@@ -496,19 +482,44 @@ It is also oberserved that the runway length is fairly insenstive to number of p
  \label{f:sw_mt}
 \end{figure}
 
-By looking at the sensitivity to the lift coefficient, shown in figure~\ref{f:sw_mtowsens}, on landing for the same trade study shown in figure~\ref{f:sw_mtow}, it can be determined whether the aircraft is constrained by the landing constraints or the take off constraints. 
-The sensitivity to a variable in a geometric program is defined as the percentage change in the objective function for a 1\% change in that variable's value.  
-For this study, either the landing constraints or the take off constraints will be active or driving the size of the vehicle.  
-Thus, if the sensitivity to the lift coefficient on landing is zero, then the landing constraints are not active. 
-Conversly, if the sensitivity is non-zero then those constraints are active and the vehicle size is landing constrained. 
+To effectively shorten the field length it is important to know whether the vehilce size is be driven by the landing or takeoff constraints. 
+Qualitatively, the landing model has a direct effect on wing loading as shown in Equations~\ref{e:sgr} and~\ref{e:stall}.  
+The takeoff model primarily effects the thrust to weight ratio but also has a small effect on the wing loading (Equation~\ref{e:to}). 
+The effect of the thrust to weight ratio ($(T/W)$) and the wing loading ($(W/S)$) is shown in figure~\ref{f:to_land_arg}
+The thrust to weight ratio drives the motor weight.  
+The wing loading drives the wing size, which in turn drives the wing weight, drag and ultimately battery weight.  
+This argument implies that the landing model would constrain the vehicle size. 
 
-Another way to view this trade space is to understand how runway length and range are effected by different minimum speed requirements.  
-Figure~\ref{f:minspeed} shows plots of minimum cruise speed vs max take off weight for different contours of runway length and range requirements.  
-This trade study was done for 5 passengers.  
-These plots show that short runway and longer range requirements are possible but require slower cruise speeds.  
-Because power scales with velocity cubed, slower speed reduces the required power and therefore battery weight, which improves the whole system. 
-Note that in both plots shown in figure~\ref{f:minspeed}, lowering the minimum speed does not always improve the vehicle weight.  
-A flat curve indicates that the aircraft is not constrained by the minimum cruise speed because of the optimum cruise speed for that set of requirements is faster than the minimum cruise speed. 
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=0.9\textwidth]{to_land_arg.pdf}
+    \caption{\textbf{Effect of thrust to weight and wing loading ratios on vehicle size.}}
+	\label{f:to_land_arg}
+	\end{center}
+\end{figure}
+
+This hypothesis, that vehicle size is more constrained by landing than takeoff, can be confirmed by looking at the sensitivity to both the landing and takeoff models. 
+The sensitivity to a variable in a geometric program is defined as the percentage change in the objective function for a 1\% change in that variable's value.  
+Therefore, if the sensitivity to the landing constraints is greater in magnitude than the sensitivity to the take off constraints then the system is landing constrained.  
+In figure~\ref{f:sw_mtowsens} the magnitude of sensitivity to the landing constraints is greater than the sensitivity to the takeoff constraints confirming that the aircraft is landing length driven. 
+The sensitivity to the takeoff constraints is not zero because the takeoff model requires a thrust to weight ratio which determines the motor weight. 
+
+
+\subsection{Requirement Trade Studies}
+
+Because of the low wing loading required by the takeoff and landing models, the the optimum cruise speed of a STOL vehicle tends to be fairly slow.
+Therefore, a minimum cruise speed requirement is imposed in the model
+
+\begin{equation}
+    V \geq V_{\mathrm{min}}.
+\end{equation}
+
+The minimum speed requirement affects the amount of power draw and consequently the amount of batteries needed.  
+This affects the ability to reach higher ranges and also increases the wing loading requiring longer runways.  
+One way to achieve higher range or shorter runways is to decrease the required minimum speed during cruise.  
+Conversely, flying faster requires shorter ranges or longer runways.
+This trade off is shown in figure~\ref{f:minspeed}.
+The flat portion of the curves indicates that the aircraft is not constrained by the minimum cruise speed (i.e. that constraint is not active) because the optimum cruise speed for that set of requirements is faster than the minimum cruise speed. 
 
 \begin{figure}[h!]
  \begin{subfigmatrix}{2}% number of columns
@@ -536,10 +547,10 @@ Table~\ref{t:techparams} compares the baseline parameters to the advanced techno
     \toprule
     Parameter                         & Baseline Value  & Advanced Value \\ \hline
     $h_{\mathrm{batt}}$               & 210 [Whr/kg]    & 300 [Whr/kg]   \\
-    $P_{\mathrm{spec}}$               & 0.7136 [kW/N]   & 0.571 [kW/N]   \\
+    $(P/W)_{\mathrm{motor}}$          & 0.7136 [kW/N]   & 0.571 [kW/N]   \\
     $C_{L_{\mathrm{max}}}$ (Landing)  & 3.5             & 4.5            \\
     $C_{L_{\mathrm{max}}}$ (TO)       & 4.0             & 5.0            \\
-    $N$                               & 0.3             & 0.5            \\
+    Decleration Factor                & 0.4             & 0.7            \\
     Runway margin                     & 40\%            & 20\%           \\
     Stall speed margin                & 30\%            & 10\%           \\
     \bottomrule
@@ -580,6 +591,28 @@ Figure~\ref{f:tech} show variations on the 5 passenger contour from figure~\ref{
 Note that increasing the maximum lift coefficient or the deceleration factor has no effect for higher runway lengths.  
 This is because at higher runway lengths the size of the aicraft is constained by the range requirement but not the runway requirement. 
 Increasing the battery specific energy however, is always beneficial because that lowers the battery weight which improves the whole system. 
+
+<<<<<<< HEAD
+\subsection{Point of Departure Vehicle}
+
+\begin{table}[H]
+    \centering
+    \caption{Design Variables}
+    \label{t:vars}
+    \begin{tabular}{l c}
+    \toprule
+    \toprule
+    Parameter                                   & Value \\ \hline
+    $W_{\mathrm{MTO}}$                          & 1496 [lbf] \\
+    $W_{\mathrm{batt}}$                         & 278 [lbf] \\
+    $W_{\mathrm{wing}}$                         & 53 [lbf] \\
+    $AR$                                        & 9 \\
+    $b$                                         & 22.3 [ft] \\
+    $V_{\mathrm{stall}}$                        & 48 [kts] \\
+    $(W/S)$                                     & 27 [lbf/ft$^2$] \\
+    \bottomrule
+\end{tabular}
+\end{table}
 
 \section{Infrastructure Feasibility}
 Infrastructure is another aspect of the system that drives the vehicle design. A range of feasible runway lengths is a requirement that flows from infrastructure and in turn defines what vehicle designs are also feasible. As previously discussed, there is a substantial amount of airport infrastructure located outside of urban centers; however within an urban center, much less airport or runway infrastructure exists. Therefore this infrastructure study will specifically consider feasible infrastructure within an urban center. The city of Boston will be used for this case study. Key topics to address include what considerations drive the placement of STOLports, what are feasible location types, and how does infrastructure availability change with infrastructure type and required size. The goal in selecting locations for STOLport infrastructure is to be able to connect to existing transportation infrastructure within an urban center.
