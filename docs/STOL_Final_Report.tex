@@ -192,25 +192,27 @@ The purpose of this paper is to conducts an in-depth analysis into the feasibili
 To conduct the vehicle design trade studies, a geometric programming (GP) vehicle sizing and performance model is developed to rapidly and holistically consider the large design space.  Ground infrastructure and approach path constraints are internalized in this model as design constraints on the aircraft.  This model is exercised to determine feasible bounds on runway operating length, and how vehicle range, speed, and payload capacity trade with ground infrastructure requirements.  
 To assess the ground infrastructure requirements, the current FAA guidance for airport design and approach path layouts is used to create the nominal layout for a short takeoff and landing area (STOLA).  The feasibility of locating these STOLA near major urban areas is assessed by looking at case studies of two particular cities, Boston and Los Angeles.  The potential for ESTOL aircraft to act as a pathway to the development of large-scale UAM systems is reviewed from a technical, operational and business feasibility perspective. Furthermore, the complementary nature of ESTOL aircraft operations and potential future VTOL UAM operations are hypothesized. As part of this work, previous literature concerning small aircraft transportation system design ~\cite{Viken}, ~\cite{Holmes}, thin-haul transportation vehicles ~\cite{Harish},~\cite{Kreimeier},~\cite{Justin} €, VTOL aircraft ~\cite{Duffy}, and STOL aircraft is considered ~\cite{Antcliff},~\cite{SeeleyIV}. 
  
+\section{Short Takeoff and Landing Considerations}
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=1.0\textwidth]{2 Notional Sites.pdf}
+    \caption{\textbf{Notional sites for STOLport locations}}
+	\label{f:nsites}
+	\end{center}
+\end{figure}
+\section{Key Enabling Technologies}
+STOL aircraft are not a new concept.  The Helio Courier, first built in the late 1940s, is one existing example, with demonstrated takeoff and landing distances of 100-300ft ~\cite{army report}.  This performance is achieved through a combination of low wing loading, high power-to-weight, and extensive use of high-lift systems.  However, the mechanical systems required are complex, while the low wing loading limits top speed and increases gust sensitivity.  Currently, STOL aircraft are not widely adopted outside of the bush pilot community. 
 
-\section{Key enabling technologies}
+The introduction of new electric aircraft technologies have the potential to change the paradigm of current STOL aircraft and make them practical for use in an UAM setting.  This is similar to the way these technologies are being proposed to change vertical flight.  The following are the key technologies that are considered for an electric STOL (eSTOL) aircraft.  
+\paragraph{Distributed Electric Propulsion}
+\paragraph{Blown Lift}
+-Limited utility on approach. Cite NASA paper with same considerations
 
-
-\paragraph{Current Technology} ESTOL aircraft are not a new concept.  The Helio Courier, first built in the late 1940s, is one existing example, with demonstrated takeoff and landing distances from 100-300ft.  Highly experienced bush pilots are able to achieve landing distances on the order of single aircraft lengths.  Developing an aircraft that can operate of extremely short runways is clearly technologically feasible.  Nevertheless, ESTOL aircraft technology has not found wide adoption outside of the relatively small community of pilots who routinely fly to remote, relatively unimproved landing areas.   There are inherent challenges in taking existing ESTOL aircraft and using them for operations near major urban areas, which are a result of the design penalties that ESTOL capability drove on the vehicles.  
-For example, current ESTOL vehicles achieve their short field performance through a combination of low wing loading, high power-to-weight, and extensive use of high-lift systems.  The low wing loading means that both maximum and best cruise speeds are fairly low.  Additionally, it makes the vehicles highly sensitive to gusts and turbulence, an important consideration for passenger operations.   The high-lift systems required are also complex (except with very low wing loadings), which adds a weight and cost penalty to these vehicles.  Depending on the type of powerplant type used, the need for high power at takeoff may also reduce the efficiency at the nominal cruising point.  More significantly, these high-power engines generated substantial noise on takeoff; a primary consideration when operating near urban areas. 
-
-\paragraph{Key Enabling Technologies} The introduction of new electric aircraft technologies has the potential to change the paradigm of current ESTOL aircraft and make them practical for use in an UAM setting.   In the case of an all-electric aircraft, the reduction in noise through the use of batteries and an electric motor is one key area of improvement.  Another is the use of blown lift with distributed electric propulsion, in a configuration similar to the NASA X-57 Maxwell.  This has the ability to generate very high effective lift coefficients (especially on takeoff), with a reduction in the complexity of the high-lift system required and/or an increase in the climb path angle.  This technology allows in increase in the vehicle wing loading, which improves the cruising speed and passenger comfort.  
-Additionally, since electric motors can be run above their maximum rated capacity for short periods of time, the weight penalties of installing a high-thrust system that is only needed on takeoff are reduced.  And since most of the motors would be shut down in cruising flight, the propulsion system can be designed to operate at or near peak efficiency throughout most of the mission.  When taken together, these key technologies enable the design of a practical ESTOL vehicle.  The range limitations come mostly from the use of batteries and their poor specific power relative to hydrocarbon fuels; replacing them with a hybrid-electric system could extend the range or reduce vehicle takeoff weight, with associated tradeoffs on noise, emissions, and direct operating cost.  
-
-\\-DEP
-\\-Blown Lift
-	-Limited utility on approach. Cite NASA paper with same considerations
-\\-High power electric motors
-	-Power burst
+\paragraph{High Power Electric Motors}
+-Power burst
 	-Braking
-\\-Deceleration methods/limits
-\\-Advanced flight controls 
-	-Post stall landings
+\paragraph{Advanced Flight Controls}
+-Post stall landings
 	-Advanced approach guidance
 
 \\Technology summary table. 
