@@ -58,6 +58,7 @@ def plot_trade(model, minx, xvar, xex, yvar, ymax, zvar, zrange, xlabel,
     return fig, ax
 
 if __name__ == "__main__":
+    path = "../docs/"
     M = Mission(sp=False)
     baseline(M)
     fig, _ = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
@@ -67,8 +68,8 @@ if __name__ == "__main__":
                         ylabel="Max Takeoff Weight [lbf]", xllabel=[450]*7,
                         fsl=14, svar=M.landing.CLland,
                         senslabel="Sensitivity to Landing Constraints")
-    fig[0].savefig("sw_mtow.pdf", bbox_inches="tight")
-    fig[1].savefig("sw_mtowsens.pdf", bbox_inches="tight")
+    fig[0].savefig(path + "sw_mtow.pdf", bbox_inches="tight")
+    fig[1].savefig(path + "sw_mtowsens.pdf", bbox_inches="tight")
     advanced(M)
     fig, _ = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
                         yvar=M.aircraft.W,
@@ -77,8 +78,8 @@ if __name__ == "__main__":
                         ylabel="Max Takeoff Weight [lbf]", xllabel=[450]*7,
                         fsl=14, svar=M.landing.CLland,
                         senslabel="Sensitivity to Landing Constraints")
-    fig[0].savefig("sw_mtowt.pdf", bbox_inches="tight")
-    fig[1].savefig("sw_mtowtsens.pdf", bbox_inches="tight")
+    fig[0].savefig(path + "sw_mtowt.pdf", bbox_inches="tight")
+    fig[1].savefig(path + "sw_mtowtsens.pdf", bbox_inches="tight")
     baseline(M)
     fig, ax = plot_trade(M, minx=False, xvar=M.cruise.Vmin, xex=1,
                          yvar=M.aircraft.W, ymax=8000, zvar=M.cruise.R,
@@ -92,7 +93,7 @@ if __name__ == "__main__":
                     hatch="/", lw=1)
     ax.text(40, 1300, "$V \geq V_{\mathrm{min}}$\n inactive", ha="center")
     ax.text(110, 1300, "$V \geq V_{\mathrm{min}}$\n active", ha="center")
-    fig.savefig("vweightR.pdf", bbox_inches="tight")
+    fig.savefig(path + "vweightR.pdf", bbox_inches="tight")
     baseline(M)
     fig, ax = plot_trade(M, minx=False, xvar=M.cruise.Vmin, xex=1,
                          yvar=M.aircraft.W, ymax=8000, zvar=M.Srunway,
@@ -106,7 +107,7 @@ if __name__ == "__main__":
                     hatch="/", lw=1)
     ax.text(40, 1300, "$V \geq V_{\mathrm{min}}$\n inactive", ha="center")
     ax.text(80, 1300, "$V \geq V_{\mathrm{min}}$\n active", ha="center")
-    fig.savefig("vweightS.pdf", bbox_inches="tight")
+    fig.savefig(path + "vweightS.pdf", bbox_inches="tight")
     baseline(M)
     fig, _ = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
                         yvar=M.aircraft.W,
@@ -116,7 +117,7 @@ if __name__ == "__main__":
                         ylabel="Max Takeoff Weight [lbf]",
                         xllabel=[245, 225, 212],
                         fsl=14)
-    fig.savefig("smtow_clmax.pdf", bbox_inches="tight")
+    fig.savefig(path + "smtow_clmax.pdf", bbox_inches="tight")
     baseline(M)
     fig, _ = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
                         yvar=M.aircraft.W,
@@ -126,7 +127,7 @@ if __name__ == "__main__":
                         ylabel="Max Takeoff Weight [lbf]",
                         xllabel=[235, 180, 200],
                         fsl=14)
-    fig.savefig("smtow_gl.pdf", bbox_inches="tight")
+    fig.savefig(path + "smtow_gl.pdf", bbox_inches="tight")
     baseline(M)
     fig, _ = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
                         yvar=M.aircraft.W,
@@ -136,5 +137,5 @@ if __name__ == "__main__":
                         ylabel="Max Takeoff Weight [lbf]",
                         xllabel=[225, 210, 210],
                         fsl=14)
-    fig.savefig("smtow_hbatt.pdf", bbox_inches="tight")
+    fig.savefig(path + "smtow_hbatt.pdf", bbox_inches="tight")
 
