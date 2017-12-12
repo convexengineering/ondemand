@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size':19})
 
 clrs = ["#084081", "#0868ac", "#2b8cbe", "#4eb3d3", "#7bccc4"]*5
+clrs2 = ["#4F090C", "#9D1317", "#EC1C23", "#F2686C", "#F9B3B6"]*5
 
 def plot_trade(model, minx, xvar, xex, yvar, ymax, zvar, zrange, xlabel,
                ylabel, xllabel, fsl=12, svar=None, senslabel=None):
@@ -31,11 +32,12 @@ def plot_trade(model, minx, xvar, xex, yvar, ymax, zvar, zrange, xlabel,
         bst = autosweep_1d(model, 0.1, model[xvar], [xmin, xmax], verbosity=0)
         _x = np.linspace(xmin, xmax, Nsweep)
         if svar:
-            sensland = bst.solarray["sensitivities"]["constants"][svar]
-            xp = bst.solarray(xvar).magnitude
-            f = interp1d(xp, sensland)
-            sensland = f(_x)
-            axs.plot(_x, sensland, c=clrs[i])
+            for sv, cls in zip(svar, [clrs, clrs2]):
+                sensland = bst.solarray["sensitivities"]["constants"][sv]
+                xp = bst.solarray(xvar).magnitude
+                f = interp1d(xp, sensland)
+                sensland = f(_x)
+                axs.plot(_x, np.abs(sensland), c=cls[i])
         y = bst.sample_at(_x)(yvar)
         lstr = "%d" if isinstance(z, int) else "%.1f"
         ax.plot(_x, y, c=clrs[i], lw=2, label=lstr % z)
@@ -61,23 +63,29 @@ if __name__ == "__main__":
     path = "../docs/"
     M = Mission(sp=False)
     baseline(M)
-    fig, _ = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
+    fig, ax = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
                         yvar=M.aircraft.W,
                         ymax=8000, zvar=M.aircraft.Npax, zrange=range(2, 9),
                         xlabel="Runway Length [ft]",
                         ylabel="Max Takeoff Weight [lbf]", xllabel=[450]*7,
-                        fsl=14, svar=M.landing.CLland,
-                        senslabel="Sensitivity to Landing Constraints")
+                        fsl=14, svar=[M.landing.CLland, M.takeoff.CLto],
+                        senslabel="Sensitivity to Constraints")
+    ax[1].set_ylim([-2, 10])
+    ax[1].text(125, -0.75, "Takeoff", ha="center")
+    ax[1].text(210, 8, "Landing")
     fig[0].savefig(path + "sw_mtow.pdf", bbox_inches="tight")
     fig[1].savefig(path + "sw_mtowsens.pdf", bbox_inches="tight")
     advanced(M)
-    fig, _ = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
+    fig, ax = plot_trade(M, minx=True, xvar=M.Srunway, xex=800,
                         yvar=M.aircraft.W,
                         ymax=8000, zvar=M.aircraft.Npax, zrange=range(2, 9),
                         xlabel="Runway Length [ft]",
                         ylabel="Max Takeoff Weight [lbf]", xllabel=[450]*7,
-                        fsl=14, svar=M.landing.CLland,
-                        senslabel="Sensitivity to Landing Constraints")
+                        fsl=14, svar=[M.landing.CLland, M.takeoff.CLto],
+                        senslabel="Sensitivity to Constraints")
+    ax[1].set_ylim([-2, 10])
+    ax[1].text(25, -0.75, "Takeoff")
+    ax[1].text(65, 8, "Landing")
     fig[0].savefig(path + "sw_mtowt.pdf", bbox_inches="tight")
     fig[1].savefig(path + "sw_mtowtsens.pdf", bbox_inches="tight")
     baseline(M)
