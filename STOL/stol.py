@@ -49,6 +49,7 @@ class Aircraft(Model):
         loading.substitutions.update({loading.kappa: 0.05,
                                       self.wing.spar.material.sigma: 1.5e9,
                                       loading.Nmax: 6,
+                                      self.wing.planform.lam: 0.7,
                                       self.wing.skin.material.tmin: 0.012*4,
                                       self.wing.mfac: 1.4,
                                       self.wing.spar.mfac: 0.8})
@@ -332,7 +333,7 @@ def advanced(model):
         model.Srunway: 200,
         model.msafety: 1.2,
         model.aircraft.Npax: 5,
-        model.aircraft.sp_motor: 7./9.81*0.8,
+        model.aircraft.sp_motor: 7./9.81*1.2,
         model.landing.fref: 1.1,
         model.takeoff.fref: 1.1,
         model.landing.gload: 0.7, model.takeoff.CLto: 5.0,
