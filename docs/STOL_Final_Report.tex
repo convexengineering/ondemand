@@ -110,6 +110,7 @@
 \maketitle
 
 \begin{abstract}
+    REWRITE!!!!!
     The feasibility of an Urban Air Mobility (UAM) system that features electric Extremely Short Takeoff and Landing (ESTOL) vehicles is investigated.  An overview is given of the system constraints that must be incorporated into the design of the vehicle.  The system-wide advantages and limitations of ESTOL aircraft are discussed, for both near- and far-term system implementations.  A detailed vehicle sizing model is developed using geometric programming, a robust optimization framework.  This model is used to determine feasible boundaries on required runway size, vehicle range, and the sensitivity of the vehicle design to high-level mission parameters such as speed and number of passengers.  Key unique drivers of the vehicle design are identified.  The impact of distributed electric propulsion (DEP) is assessed.  Performance relative to a comparable Vertical Takeoff and Landing (VTOL) vehicle is analyzed, both with currently available technology and forecasted future technology.   The infrastructure requirements (runway size, approach paths, etc.) needed to support ESTOL operations are assessed according to current regulations.  Two major urban areas (Boston and Los Angeles) are presented as case studies to show where this infrastructure could be feasibly located.  Key challenges and risks to implementation are discussed.  
 
 
@@ -124,6 +125,7 @@
   XXXXXXX \= \kill% this line sets tab stop
 $A$ \> takeoff helper variable \\
 $AR$ \> wing aspect ratio \\
+ATC \> air traffic control \\
 $b$ \> wing span \\ % [ft] \\
 $B$ \> takeoff helper variable \\
 $c$ \> wing chord \\ %[m] \\
@@ -134,36 +136,53 @@ $c_{d_p}$ \> wing profile drag coefficient \\
 $C_L$ \> lift coefficient \\
 $C_{L_g}$ \> ground lift coefficient \\
 $C_{L_{\mathrm{max}}}$ \> max lift coefficient \\
+CTOL \> conventional take off and landing \\
 $D$ \> drag \\
+DEP \> distributed electric propulsion \\
 $e$ \> span efficiency \\
 $f_{\mathrm{struct}}$ \> fractional structural weight \\
 $g$ \> gravitational constant \\
+GP \> geometric programming
+$h_{\mathrm{batt}}$ \> specific battery energy \\
 $L$ \> lift \\
 $\mathcal{M}_{\mathrm{root}}$ \> root moment stress \\
 $N$ \> deceleration factor \\
+$N_{\mathrm{pax}}$ \> number of passengers \\
 $P_{\mathrm{shaft-max}}$ \> max shaft power \\
-$P_{\mathrm{spec}}$ \> specific motor power \\
+$(P/W)_{\mathrm{motor}}$ \> motor specific power \\
+$R$ \> vehicle range \\
 $Re$ \> Reynolds number \\
 $S$ \> wing area \\
 $S_{\mathrm{land}}$ \> landing ground roll \\
 $S_{\mathrm{runway}}$ \> runway distance \\
 $S_{\mathrm{TO}}$ \> take off ground roll \\
+STOL \> short take off and landing \\
 $S_{y_{\mathrm{spar}}}$ \> spar section modulus \\
-$t$ \> time \\
+$t$ \> flight time \\
 $T$ \> thrust \\
+TOLA \> takeoff and landing area \\
+UAM \> urban air mobility \\
 $V$ \> speed \\
+$V_{\mathrm{cruise}}$ \> cruise speed \\
+$V_{\mathrm{min}}$ \> minimum cruise speed \\
+$V_{\mathrm{TO}}$ \> takeoff speed \\
+$V_{\mathrm{TD}}$ \> touch down speed \\
 $V_{\mathrm{stall}}$ \> stall speed \\
+VFR \> visual flight rules \\
+VTOL \> vertical take off and landing \\
 $W_{\mathrm{batt}}$ \> battery weight \\
 $W_{\mathrm{fadd}}$ \> additional wing weight\\
 $W_{\mathrm{motor}}$ \> motor weight \\
 $W_{\mathrm{MTO}}$ \> max take off weight \\
-$W_{\mathrm{pay}}$ \> payload weight \\
+$W_{\mathrm{pax}}$ \> passenger weight \\
 $W_{\mathrm{skin}}$ \> wing skin weight \\
 $W_{\mathrm{spar}}$ \> wing spar weight \\
 $W_{\mathrm{struct}}$ \> structural weight \\
 $W_{\mathrm{wing}}$ \> wing weight \\
+$W/S$ \> wing loading \\
 $\eta_{\mathrm{elec}}$ \> combined electric efficiency \\
 $\eta_{\mathrm{prop}}$ \> propeller efficiency \\
+$\gamma_{\mathrm{approach}}$ \> flight path angle \\
 $\mu$ \> rolling friction coefficient \\
 $\rho$ \> air density \\
 $\sigma_{\mathrm{CFRP}}$ \> carbon fiber allowable stress \\
@@ -173,13 +192,11 @@ $\sigma_{\mathrm{CFRP}}$ \> carbon fiber allowable stress \\
 % \printglossary% creates nomenclature section produced by MakeIndex
 
 \section{Introduction}
-Within the aviation industry there is a strong and growing interest in the development of Urban Air Mobility (UAM) networks,  which are aerial transportation systems in and around major metropolitan areas.  The defining features of UAM networks are fleets of relatively small vehicles operating off a distributed network of takeoff and landing areas (TOLAs) located within dense urban centers, primarily focused on passenger transport. Past efforts at developing UAM networks based on helicopters were largely unsuccessful due to the high costs of helicopter operation, the high levels of noise generated during operations, and the poor safety record of these aircraft~\cite{Vascik2017}.  Recent advances in electric vehicle propulsion and key subsystem technologies have opened the door to new vehicle configurations that may mitigate these fundamental challenges.  The ride-sharing operational models that have been successfully developed for ground transportation also have the potential to improve the economics of UAM  operations through pooling and on-demand service. This has sparked renewed interest in the UAM concept, and there are currently over a dozen legacy and emerging aircraft manufacturers building or flight-testing UAM-specific aircraft. 
+Within the aviation industry there is a strong and growing interest in the development of Urban Air Mobility (UAM) networks,  which are aerial transportation systems in and around major metropolitan areas.  The defining features of UAM networks are fleets of relatively small vehicles operating off a distributed network of takeoff and landing areas (TOLAs) located within dense urban centers, primarily focused on passenger transport. Past efforts at developing UAM networks based on helicopters were largely unsuccessful due to the high costs of helicopter operations, the high levels of noise generated, and the poor safety record of these aircraft~\cite{Vascik2017}.  Recent advances in electric vehicle propulsion and key subsystem technologies have opened the door to new vehicle configurations that may mitigate these fundamental challenges.  The ride-sharing operational models that have been successfully developed for ground transportation also have the potential to improve the economics of UAM  operations through pooling and on-demand service. This has sparked renewed interest in the UAM concept, and there are currently over a dozen legacy and emerging aircraft manufacturers building or flight-testing UAM-specific aircraft. The majority of UAM vehicle concepts propose an eVTOL (electric vertical and takeoff landing) configuration mainly because they do not require large runways and have lower noise signatures than conventional helicopters.  
 
-All of the UAM vehicles currently under development utilize an all-electric power train and have vertical takeoff and landing (VTOL) capability; they are commonly known as eVTOL aircraft.  Within this eVTOL landscape, there are many different proposed configurations, including tilt-rotors, multicopters, slowed rotors, and tilt-wings.  Almost all configurations are also based on the concept of distributed electric propulsion (DEP), which replaces one or two large helicopter-style rotors with many small rotors.  These DEP eVTOL configurations have several advantages;  VTOL capability minimizes the amount of space required at TOLAs and susceptibility to crosswinds, while DEP increases system efficiency and safety while reducing mechanical complexity and, potentially, cost and noise.  This is useful capability for operations in noise-sensitive areas where takeoff and landing space is at a premium, but it also imposes two significant penalties on the vehicle.  The first is in performance; the weight of the high-power system needed to perform the vertical takeoff and landing limits the amount of payload these vehicles can carry, or the range at which they can carry it.  This effect is especially pronounced for electric aircraft, where payload and range are already compromised by the poor specific energy of current battery technology relative to hydrocarbon fuels.  The second and more significant penalty is that VTOL configurations increase the already substantial amount of risk associated with the UAM concept.  
+Any proposed UAM system is exposed to many sources of risk, such as local noise regulations, ATC capacity concerns, pilot or automation availability, infrastructure availability, and uncertain market demand~\cite{Vascik2017}~\cite{Uber}.  The most significant risk is the ability to certify a new type of vehicle because inability to certify would preclude an UAM operations.  Certifying new eVTOL aircraft is likely to be difficult because historically certifying novel types of aircraft has been extremely difficult.  This paper aims to show that using a conventional, short takeoff and land (STOL), fixed-winged configuration reduces the certification risk and is also feasible for UAM operations.   
 
-Any proposed UAM system is exposed to many sources of risk, such as local noise regulations, ATC capacity concerns, pilot or automation availability, infrastructure availability, and uncertain market demand~\cite{Vascik2017}~\cite{Uber}.  Of all the risk sources, however, the most significant is whether, and within what timeframe, it will be possible to certify these new types of aircraft.  This risk is so significant for two reasons.  It is highly likely to be a factor - historically, certification of new aviation technologies is a slow and difficult process -  and it is highly consequential.  The inability to certify a vehicle would preclude any type of UAM operations.
-
-In considering certification risk, it is important to differentiate between risk inherent in certifying a vehicle configuration, and risk inherent in certifying a vehicle flight control system.  In many UAM proposals, advanced vehicle automation is seen as a key enabling technology for large-scale operations, while initial operations are expected to operate with a human pilot operating the aircraft ~\cite{Uber}.  To achieve that initial operational capability, only certification of vehicle automation or flight control systems required by the configuration for piloted operations (such as the flight stabilization system in a multicopter) should be considered.  Certification of advanced autonomous systems is a separate risk category, and should not be confused the risk of certifying the vehicle configuration for traditional piloted operations. 
+In considering certification risk, it is important to differentiate between risk inherent in certifying a vehicle configuration, and risk inherent in certifying a vehicle flight control system.  In many UAM proposals, advanced vehicle automation is seen as a key enabling technology for large-scale operations, while initial operations are expected to operate with a human pilot operating the aircraft ~\cite{Uber}.  To achieve that initial operational capability, only certification of vehicle automation or flight control systems required by the configuration for piloted operations (such as the flight stabilization system in a multicopter) should be considered.  Certification of advanced autonomous systems is a separate risk category, and should not be confused with the risk of certifying the vehicle configuration for traditional piloted operations. 
 
 Certification risk arises from the potential for catastrophic vehicle failures, whether or not the catastrophic failure modes are sufficiently mitigated, and how complex the mitigations required are.  A vehicle with few inherent catastrophic failure modes is easier to certify than a vehicle where many catastrophic failure modes are mitigated by a variety of complex systems.  For DEP eVTOL aircraft, certification risk arises from the potential failure of three critical systems common to all configurations:  1) the active flight stabilization system that controls vehicle attitude and lift during the vertical and translational phases of flight via differential thrust 2) the power delivery system that supplies power from the batteries to the motors, and the motors themselves and 3) the batteries that store electrical power. 
 
@@ -274,13 +291,13 @@ DEP is a collection of enabling technologies (high specific energy batteries, el
 
 \paragraph{Blown Lift}
 Blown lift is a increases the effective wing lift coefficient through two main effects.  The first is the increase in effective dynamic pressure over the wing due to the accelerated propeller wake.  The second is the interaction between the propeller wake and the flaps, which turn the wake downward and produce an upwards force as a result. ~\cite{MooreDEP}.  Figure ~\ref{f:blown_lift} is from a NASA investigation into the effectiveness of blown lift. ~\cite{Deere}  It shows, for an X-57 like wing, that substantial increases in effective wing CL are possible.  As a conservative estimate, 4.0 was used as our baseline value of takeoff $CL_{max}$, and 5.0 for the advanced value.  
-\begin{figure}[!h]
-	\begin{center}
-	\includegraphics[width = 1.\textwidth]{blown_lift_chart.pdf}
-    \caption{\textbf{NASA studies show significant increases in $CL_{max}$ due to blown lift~\cite{study}}}
-	\label{f:blown_lift}
-	\end{center}
-\end{figure}
+% \begin{figure}[!h]
+% 	\begin{center}
+% 	\includegraphics[width = 1.\textwidth]{blown_lift_chart.pdf}
+%     \caption{\textbf{NASA studies show significant increases in $CL_{max}$ due to blown lift~\cite{study}}}
+% 	\label{f:blown_lift}
+% 	\end{center}
+% \end{figure}
 From this figure it should be noted that the power required to achieve the high CL becomes quite high, especially in the landing configuration.  As discussed by Patterson ~\cite{Patterson2017}, this may limit the extent to which blown lift can be utilized during the approach phase of flight.  If the power required to achieve a high lift coefficient for a given vehicle exceeds the power required for a given approach angle (or level flight in the limit), then it is not useful for landing.  This effect may be offset by adding drag (spoilers, windmilling propellers) which would also have the beneficial effect of increasing approach angle; this is key vehicle-level trade study.  Based on the drag polars given in ~\cite{Deere}, an X-57 like aircraft would be limited to a $CL_{max}$ of 3.5 on approach without a high-drag system; for the purposes of this paper that is used as the baseline approach $CL_{max}$, and 4.5 is used for the advanced case.  
 
 \paragraph{High Power Electric Motors}
