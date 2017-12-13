@@ -435,7 +435,7 @@ This constraint will drive the wing loading down.
 \end{equation}
 
 where $N=1$ corresponds to a 1-g deceleration. 
-The deceleration factor is a function of the technologies used to stop the aircraft and include, but are not limited to: breaks, reverse thrust from electric motors, and drag.  
+The deceleration factor is a function of the technologies used to stop the aircraft and include, but are not limited to: brakes, reverse thrust from electric motors, and drag.  This was used instead of a more conventional braking model because, as discussed subsequently, these vehicles are driven primarily by landing constraints.  This creates an incentive to use some type of thrust reversal or dedicated braking thrust system to shorten the landing distance.  The details of this system are an important vehicle level design trade; the landing deceleration used in this system-level study becomes the design requirement for a future vehicle design effort. Passenger tolerance for negative deceleration may limit how high this target can be increased, but that requires future study.  
 To understand how the g-loading constant varies with different amounts of reverse thrust, the ground roll and deceleration factor are calculate for the X-57 as an example case. 
 Table~\ref{t:landingdecel} shows the deceleration loading factor for different amounts of reverse thrust. 
 
@@ -456,15 +456,10 @@ Table~\ref{t:landingdecel} shows the deceleration loading factor for different a
 \end{tabular}
 \end{table}
 
-For both the landing and takeoff constraints it is assumed that the velocity has a 20\% margin on the stall velocity,
-
-\begin{equation}
-    \label{e:stall}
-    V_{\mathrm{TD,TO}} = 1.3V_{\mathrm{stall}} = \sqrt{\frac{2W_{\mathrm{MTO}}}{\rho S C_{L_{\mathrm{max}}}}}.
-\end{equation}
-
+For both the landing and takeoff constraints it is assumed that the velocity has a 30\% margin above the stall velocity,
+For the purposes of this study, deceleration corresponding to braking with a small amount of reverse thrust (.4g) was used for the conservative case, while a more powerful thrust reversal system (.7g) was used for the aggressive case. 
 It is assumed that the the max lift coefficient is different for landing and takeoff.
-Another 40\% margin is placed on the ground roll distance to determine runway length
+Another 40\% margin is placed on the ground roll distance to determine runway length.  For this vehicle, balanced field length considerations were not considered as the loss of a single engine is only a small reduction in total thrust.  Additionally, takeoff distance over a 35ft obstacle was not considered since the focus is on determining the amount of physical infrastructure required.  Where appropriate (such as when the runway is located at ground level) the appropriate 35ft obstacle clearance will be added.  
 
 \begin{align}
     S_{\mathrm{runway}} &\geq 1.4S_{\mathrm{TO}} \\
@@ -513,7 +508,7 @@ It is also oberserved that the runway length is fairly insenstive to number of p
  \label{f:sw_mt}
 \end{figure}
 
-To effectively shorten the field length it is important to know whether the vehilce size is be driven by the landing or takeoff constraints. 
+To effectively shorten the field length it is important to know whether the vehicle size is driven by the landing or takeoff constraints. 
 Qualitatively, the landing model has a direct effect on wing loading as shown in Equations~\ref{e:sgr} and~\ref{e:stall}.  
 The takeoff model primarily effects the thrust to weight ratio but also has a small effect on the wing loading (Equation~\ref{e:to}). 
 The effect of the thrust to weight ratio ($(T/W)$) and the wing loading ($(W/S)$) is shown in figure~\ref{f:to_land_arg}
@@ -549,7 +544,7 @@ The minimum speed requirement affects the amount of power draw and consequently 
 This affects the ability to reach higher ranges and also increases the wing loading requiring longer runways.  
 One way to achieve higher range or shorter runways is to decrease the required minimum speed during cruise.  
 Conversely, flying faster requires shorter ranges or longer runways.
-This trade off is shown in figure~\ref{f:minspeed}.
+This trade off is shown in Figure~\ref{f:minspeed}.
 The flat portion of the curves indicates that the aircraft is not constrained by the minimum cruise speed (i.e. that constraint is not active) because the optimum cruise speed for that set of requirements is faster than the minimum cruise speed. 
 
 \begin{figure}[h!]
@@ -558,14 +553,14 @@ The flat portion of the curves indicates that the aircraft is not constrained by
      \subfigure[\label{f:vweightS}Contours of runway length]{\includegraphics[]{vweightS.pdf}}
  \end{subfigmatrix}
  \caption{\textbf{Trade study between requirements of runway length, minimum speed and range.}}
- \label{f:rangetod}
+ \label{f:minspeed}
 \end{figure}
 
 \subsection{Advanced Technology Trade Studies}
 
 The previous section showed fundamental trade studies and trends for how runway length varies with performance.  
 It is also possible to shorten runway length through advanced technology. 
-As disscussed previously, a number of technologies could help reduce the required runway length including power bursts from electric motors, reverse thrust on landing, advanced flight controls, and improved battery technology.  
+As discussed previously, a number of technologies could help reduce the required runway length including power bursts from electric motors, reverse thrust on landing, advanced flight controls, and improved battery technology.  
 The effect of these technology advances on required runway length can be observed by changing a few parameters from the baseline case and resolving the optimization model.
 Table~\ref{t:techparams} compares the conservative parameters to the aggressive technology parameters that were assumed in the optimization model based off of the technologies discuessed in Table~\ref{t:techtable}. 
 
@@ -643,13 +638,11 @@ Key variable values for both solutions are listed in Table~\ref{t:pod}.
 \end{table}
 
 One significant advantage this aicraft offers over an electric VTOL vehicle is the capacity to carry more passengers.  The proposed vehicle can carry 5 passengers, while electric VTOL vehicles are typically limited to 2.  
-it is also noted that the runway length for the conservative case is 400 ft but runway lengths as short as 300 ft may be possible assuming some of the advanced technology is used. 
+it is also noted that the runway length for the conservative case is 400 ft but runway lengths as short as 100 ft may be possible if all  of the advanced technology is used.  While all those benefits are unlikely to be realized in the near term, runway lengths of 200-300 feet are possibly if infrastructure availability requires it.  This is especially true of the speed or payload requirements are slightly reduced.  
 This information can be used to inform infrastructure decisions.  
-Runway lengths need to be at least 400 ft, but could be as short has 300 ft if infrastructure availability improves for shorter runways. 
-
 Figure~\ref{f:vehicle} shows a visualization of the point of departure vehicle.  
 The design features a distributed electric propulsion system.  
-Additionally, all the batteries are able to fit wings allowing for simplier fuselage configurations. 
+Additionally, all the batteries are able to fit wings allowing for simpler fuselage configurations. 
 
 \begin{figure}[h!]
  \begin{subfigmatrix}{2}% number of columns
@@ -661,10 +654,11 @@ Additionally, all the batteries are able to fit wings allowing for simplier fuse
  \end{figure}
 
 \section{Infrastructure Feasibility}
-Infrastructure is another aspect of the system that drives the vehicle design. A range of feasible runway lengths is a requirement that flows from infrastructure and in turn defines what vehicle designs are also feasible. As previously discussed, there is a substantial amount of airport infrastructure located outside of urban centers; however within an urban center, much less airport or runway infrastructure exists. Therefore this infrastructure study will specifically consider feasible infrastructure within an urban center. The city of Boston will be used for this case study. Key topics to address include what considerations drive the placement of STOLports, what are feasible location types, and how does infrastructure availability change with infrastructure type and required size. The goal in selecting locations for STOLport infrastructure is to be able to connect to existing transportation infrastructure within an urban center.
+Infrastructure is another aspect of the system that drives the vehicle design. A range of feasible runway lengths is a requirement that flows from infrastructure and in turn defines what vehicle designs are also feasible. As previously discussed, there is a substantial amount of airport infrastructure located outside of urban centers; however within an urban center, much less airport or runway infrastructure exists. Therefore this Boston study will specifically consider feasible infrastructure within the urban center.  Key topics to address include what considerations drive the placement of STOLports, what are feasible location types, and how does infrastructure availability change with infrastructure type and required size. The goal in selecting locations for STOLport infrastructure is to be able to connect to existing transportation infrastructure within an urban center.
 \paragraph{Site Considerations}
 Site considerations are not driven solely by runway length. The minimum rectangular area upon which a STOLport can be built is defined by runway length as we well as room for taxiways, clearway requirements, and space for parking and charging stations. Clearway requirements are written in the FAA AC 150/5300 and are dependent on aircraft size and speed ~\cite{AC150}. For locations that may be space restricted, a STOLpad rather than a STOLport concept is possible, which would consist of only the bare minimum infrastructure and would not include space for considerations such as parking and charging stations. Site considerations are also dependent on VFR approach and departure paths and the need for obstacle avoidance. Obstacle avoidance is defined as a plane of a defined width at a given distance and height from the runway, through which no obstacle may protrude; obstacle avoidance definitions are also dependent on vehicle size and speed ~\cite{AC150}. The key drivers for site considerations are area available, which is more than solely runway length, and obstacle avoidance for approach and departure paths.\\
 One other factor to consider when analyzing potential STOLport infrastructure is the weight capacity of the construction. Taking a look at a case study of Boston, there is currently five existing helipads on top of buildings within the city limits. The helipad construction allows for helicopters of maximum weight ranging from 10,000 to 22,000 pounds to land on the pads. This shows that with current construction materials and techniques, similar STOLports could be built to meet the landing requirements of the proposed Baseline (3180lb MTOW) and Advanced (2080lb MTOW) point of departure STOL vehicles.
+
 \paragraph{Crosswind Mitigation}
 
 An additional consideration for infrastructure availability is crosswind mitigation. In order to have a robust UAM system, wind should not be a prohibitive factor for operations. Specific considerations for the particular wind patterns of the city in question should be incorporated when deciding on infrastructure location. There are various techniques to mitigate for multiple wind directions. One way is to have conventional crosswind runways. A disadvantage for this is that it will require additional surface area for the STOLport, which could possibly reduce the amount of infrastructure available. To reduce the severity of this impact, the crosswind design could take credit for the headwind component inherent in triggering the switch to the crosswind runway. A rule of thumb says that take-off and landing distances are reduced by 1.5 $\%$  for each knot of headwind up to 20 knots ~\cite{Headwind}. An additional option would be to create a circular STOLport with the diameter of the required runway length. The runway heading could be set dynamically based on the prevailing winds. This would require more complex approach and departure procedures, 360-degree obstacle clearance, and portable charging stations. If the STOLport is built over linear pre-existing infrastructure such as highways and railways, an additional STOLport can be built nearby with a perpendicular orientation to serve the same geographic location when crosswind conditions exist. Lastly, if barges are used as the STOLport then they could be moored to allow for rotation into the wind. This would require an increased footprint in the waterways which needs to be deconflicted with boating channels.
@@ -717,24 +711,18 @@ Buildings are the type of infrastructure location that is most dependent on runw
 \end{figure}
 
 \section{Key Challenges and Risks}
--Crosswind\\
--Passenger comfort, gust rejection\\
--Effectiveness of reverse thrust, blown lift\\
--Noise \\
--Ground overflight \\
-
-
-These risks are applicable to the entire UAM concept regardless of what vehicle is providing the service; however designing a STOL vehicle instead of a VTOL vehicle provides lower relative risk in many of these areas. As shown in the risk matrix below the overall risk to using STOL for UAM is lower than VTOL. 
-As mentioned before, the airspace access and scalability applies to the entire UAM market and the risk scales directly with the density of the network, independent of the type of vehicle. Therefore, both STOL and VTOL have a similar risk in this category. Likewise, the risk of high cost is comparable for both STOL and VTOL due to the large variation in the potential designs of each system.  These both have a similar likelihood for being risky, but with a relatively low impact.
-
- 
+There are several key challenges and risks that are inherent to the STOL UAM network that require further effort to understand more fully.    
+\paragraph{Crosswinds} While there are several effective strategies for dealing with crosswinds, the relative effectiveness of each and their effect on network density requires further investigation.  This is likely to vary from city to city, based on the prevalent local wind conditions.  Additionally, the effect of crosswind considerations on vehicle design is an important part of the trade space, especially for these low-speed vehicles.  
+\paragraph{Deconfliction with large-scale commercial operations}
+This is a risk present for any UAM network, but operations in the vicinity of a busy hub airport like Boston Logan require careful ATC coordination to ensure safe separation between landing commercial aircraft and UAM vehicles.   This is especially true for UAM aircraft landing at or near large hub airports. 
+\paragraph{Passenger Comfort} STOL operations require significant accelerations and decelerations on takeoff and landing, and the lightly wing loaded vehicles have high gust susceptibility. All of these factors may negatively impact passenger comfort.  Gust-damping systems similar to those found on large commercial aircraft may be used.  Passenger comfort is difficult to quantify; where this limits the vehicle design needs to be investigated in more detail.
+\paragraph{Reverse thrust systems} There is a clear benefit to having a reverse thrust system for a STOL vehicles.  However, it is unclear how effective reversing propeller rotation direction would be, or if more effective (but heavy) variable pitch props are required.  The effects of wet runways also need to be considered.  
+\paragraph{Noise and Community overflight} It is unclear that the noise levels generated by these vehicles will be low enough to allow widespread operations over noise-sensitive areas. More detailed modeling is required to understand the exact noise impact of these types of vehicles, relative to both eVTOL configurations and the annoyance threshold of the surrounding populations.  It is also recognized that the shallow (relative to an eVTOL) approach and departure angles mean that surrounding communities might experience more overflight below 500ft.  However, with the blown flaps and high T/W, very steep departure angles are possible, which may give total noise exposure similar to eVTOLs.  On approach, the power setting will be low so the primary negative effects of overflight (noise) should be reduced.  This requires more in-depth work. 
 
 \section{Conclusion}
-\paragraph{Infrastructure}
+This analysis has showed that eSTOL aircraft are a feasible option for a UAM network, with significant advantages relative to vehicle payload and certification risk.  Vehicle runway lengths as short as 200-300 ft are shown to be feasible with current technologies, although a cruise speed reduction or some advanced technology may be required to achieve 200ft.   Runway lengths above 400ft are readily achievable for eSTOL aircraft. 
 Possible types of locations for STOLports identified in this study include on top of buildings, over highways and railways, on barges, or on the ground of existing airports. Building infrastructure is the type of location most dependent on runway length. The STOLport locations can support runway lengths of 400 to 600 feet. If a vehicle is able to land in a runway of 300 feet or less, then the number of possible STOLport locations exponentially increases. Landing in a runway length of 500 feet or less could allow for novel operations at existing major airports. The results of the infrastructure study indicate that it is possible to design a STOLport network in an urban center.
-
-
-Rising tide lifts all boats - STOL can push forward the key technologies needed for eVTOLS, while allowing market testing and.development of operational technologies. 
+STOL aircraft offer a near-term pathway to implementing a UAM network, allowing a company to capture early market share and start developing the operational knowledge of how to conduct these types of operations in the existing ATC environment.  STOL is a low-risk way to advance, test, and refine the UAM concept and all underlying technologies and operational infrastructures.  
 \bibliography{biblibrary}
 \bibliographystyle{aiaa}
 
