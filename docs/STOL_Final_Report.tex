@@ -259,9 +259,8 @@ If significant new infrastructure investments are required in any case to make t
 \section{Vehicle Design Considerations and Key Enabling Technologies}
 STOL aircraft make design compromises to achieve short-field performance, the significance of which increase as the required runway length becomes shorter.  This section will discuss some of the key vehicle-level trades involved in designing an aircraft for short-field performance, and will discuss some of the ways that emerging electric aircraft technologies will offer improved performance over historical vehicles. 
 
-
 \paragraph{Short Takeoff and Landing Considerations}
-Figure ~\ref{f:takeoff} shows a simplified sketch of the aircraft during takeoff (top) and landing (bottom).  At a high level, the runway a vehicle operates off of must be equal to the larger of either the takeoff or landing distances.  To shorten the runway, both the takeoff and landing distances $S_{TO}$ and $S_{land}$ must be reduced.  The takeoff distance is a function of the time it takes the aircraft to reach a given liftoff speed $V_{LO}$, which is a multiple of the vehicle stall speed as required ~\cite{ASTM3179}.  The stall speed is related to the physical aircraft parameters by Equation ~\ref{e:stall}.  To reduce the takeoff distance, the vehicle design can be changed such that it reaches the liftoff speed faster by increasing the thrust, or the liftoff speed can be lower by decreasing the wing loading $W/S_{ref}$ increasing the wing $CL_{max}$.  These changes also serve to increase the climb angle $\gamma_{climb}$, which is desirable to minimize the time spent at low altitude. 
+Figure ~\ref{f:takeoff} shows a simplified sketch of the aircraft during takeoff (top) and landing (bottom).  At a high level, the runway a vehicle operates off of must be equal to the larger of either the takeoff or landing distances.  To shorten the runway, both the takeoff and landing distances $S_{TO}$ and $S_{land}$ must be reduced.  The takeoff distance is a function of the time it takes the aircraft to reach a given liftoff speed $V_{LO}$, which is a multiple of the vehicle stall speed as required ~\cite{ASTM3179}.  The stall speed is related to the physical aircraft parameters by Equation ~\ref{e:stall}.  To reduce the takeoff distance, the vehicle design can be changed such that it reaches the liftoff speed faster by increasing the thrust, or the liftoff speed can be lower by decreasing the wing loading $W/S$ or by increasing the wing $CL_{max}$.  These changes also serve to increase the climb angle $\gamma_{climb}$, which is desirable to minimize the time spent at low altitude. 
 \begin{figure}[h!]
 	\begin{center}
 	\includegraphics[width=1.0\textwidth]{takeoff_fig.pdf}
@@ -274,11 +273,11 @@ Figure ~\ref{f:takeoff} shows a simplified sketch of the aircraft during takeoff
     \label{e:stall}
     V_{\mathrm{TD,TO}} = 1.3V_{\mathrm{stall}} = \sqrt{\frac{2W_{\mathrm{MTO}}}{\rho S C_{L_{\mathrm{max}}}}}.
 \end{equation}
-Decreased $W/S_{ref}$ and increased $CL_{max}$ also help reduce the landing distance, since the reduce the touchdown speed $V_{TD}$, which is also scaled from $V_{stall}$.  Additionally, the landing distance may be shortened by increasing the drag after touchdown, either by wheel brakes, aerodynamic braking, or reverse thrust.  
+Decreased $W/S_{ref}$ and increased $CL_{max}$ also help reduce the landing distance, since they reduce the touchdown speed $V_{TD}$.  Additionally, the landing distance may be shortened by increasing the drag after touchdown, either by wheel brakes, aerodynamic braking, or reverse thrust.  
 
-For these reasons, compared to conventional takeoff and landing (CTOL) aircraft of the same size, STOL vehicles tend to be more lightly wing loaded, have high power-weight ratios, and have large and complex high-lift systems to increase $CL_{max}$ as much as possible.  To first order, high power-to-weight ratios and complex high-lift systems both add significant weight to the system, with second-order penalties on efficiency.  For a given aircraft, decreasing wing loading below its optimal value will limit the top speed of the vehicle, as well as making it more sensitive to wind gusts.  It will also increase the power required to cruise at a given speed, requiring additional fuel or batteries, or reducing range.  For these reasons, and since short field capability is not required at most airports, STOL aircraft have not widely adopted outside of the bush pilot community. 
+For these reasons, compared to conventional takeoff and landing (CTOL) aircraft of the same size, STOL vehicles tend to be more lightly wing loaded, have high power-to-weight ratios, and have large and complex high-lift systems to maximize $CL_{max}$.  To first order, high power-to-weight ratios and complex high-lift systems both add significant weight to the system, with second-order penalties on efficiency.  For a given aircraft, decreasing wing loading below its optimal value will limit the top speed of the vehicle, as well as making it more sensitive to wind gusts.  It will also increase the power required to cruise at a given speed, requiring additional fuel or batteries, or reducing range.  For these reasons, and since short field capability is not required at most airports, STOL aircraft have not been widely adopted outside of the bush pilot community. 
 
-The introduction of new electric aircraft technologies offer a variety of potential improvements over existing STOL aircraft, giving them significant advantages both in the UAM market and relative to current STOL vehicles.  This is similar to the way these technologies are being proposed to change vertical flight.  The following are the key technologies that are considered for an electric STOL (eSTOL) aircraft.  The impact of each technology will be assessed at a conservative baseline level, as well as a more optimistic advanced level to show the potential impact of technological improvements.  
+The introduction of new electric aircraft technologies offer a variety of potential improvements over existing STOL aircraft, giving them significant advantages both in the UAM market and relative to current STOL vehicles.  This is similar to the way these technologies are being proposed to change vertical flight.  The following are the key technologies that are considered for an electric STOL (eSTOL) aircraft.  The impact of each technology will be assessed at a conservative baseline level, as well as a more agressive advanced level to show the potential impact of technological improvements.  
 \begin{wrapfigure}{R}{0.4\textwidth}
 	\begin{center}
 	\includegraphics{x-57.jpg}
@@ -287,26 +286,26 @@ The introduction of new electric aircraft technologies offer a variety of potent
 	\end{center}
 \end{wrapfigure}
 \paragraph{Distributed Electric Propulsion}
-DEP is a collection of enabling technologies (high specific energy batteries, electric motors and controllers) that enable the replacement of a few large propulsors with many smaller ones.  The NASA X-57 shown in Figure ~\ref{f:x57} is an example of a fixed-wing DEP configuration currently being developed.   This novel propulsion system architecture allows optimization of different parts of the propulsion system for different phases of flight, which increases overall efficiency.  It also increased system redundancy, and most importantly for this application increases the effectiveness of the wing through blown lift (discussed below).  From a modeling perspective, it also allows cruise efficiency to be treated independently of takeoff power.  References ~\cite{StollDEP} and ~\cite{MooreDEP} discuss the benefits of DEP in more detail. 
+DEP is a collection of enabling technologies (high specific energy batteries, electric motors and controllers) that enable the replacement of a few large propulsors with many smaller ones.  The NASA X-57 shown in Figure ~\ref{f:x57} is an example of a fixed-wing DEP configuration currently being developed.   This novel propulsion system architecture allows optimization of different parts of the propulsion system for different phases of flight, which increases overall efficiency.  It also increases system redundancy, and most importantly for this application increases the effectiveness of the wing through blown lift (discussed below).  From a modeling perspective, it also allows cruise efficiency to be treated independently of takeoff power.  References ~\cite{StollDEP} and~\cite{MooreDEP} discuss the benefits of DEP in more detail. 
 
 \paragraph{Blown Lift}
-Blown lift is a increases the effective wing lift coefficient through two main effects.  The first is the increase in effective dynamic pressure over the wing due to the accelerated propeller wake.  The second is the interaction between the propeller wake and the flaps, which turn the wake downward and produce an upwards force as a result ~\cite{MooreDEP}.  Figure ~\ref{f:blown_lift} is from a NASA investigation into the effectiveness of blown lift ~\cite{Deere}.  It shows, for an X-57 like wing, that substantial increases in effective wing CL are possible.  As a conservative estimate, 4.0 was used as our baseline value of takeoff $CL_{max}$, and 5.0 for the advanced value.  The results of this study have been largely validated through ground testing~\cite{Stoll2015}. 
+Blown lift increases the effective wing lift coefficient through two main effects.  The first is the increase in effective dynamic pressure over the wing due to the accelerated propeller wake.  The second is the interaction between the propeller wake and the flaps, which turn the wake downward and produce an upwards force as a result~\cite{MooreDEP}.  Figure~\ref{f:blown_lift} is from a NASA investigation into the effectiveness of blown lift~\cite{Deere}.  It shows, for an X-57 like wing, that substantial increases in effective wing CL are possible.  As a conservative estimate, 4.0 was used as our baseline value of takeoff $CL_{max}$, and 5.0 for the advanced value.  The results of this study have been largely validated through ground testing~\cite{Stoll2015}. 
 
  \begin{figure}[!h]
  	\begin{center}
  	\includegraphics[width = 1.\textwidth]{blown_lift_chart.pdf}
-     \caption{\textbf{NASA studies show significant increases in $CL_{max}$ due to blown lift~\cite{study}}}
+     \caption{\textbf{NASA modeling shows significant increases in $CL_{max}$ due to blown lift~\cite{Deere}}}
  	\label{f:blown_lift}
  	\end{center}
  \end{figure}
  
-From this figure it should be noted that the power required to achieve the high CL is high, especially in the landing configuration.  As discussed by Patterson~\cite{Patterson2017}, this may limit the extent to which blown lift can be utilized during the approach phase of flight.  If the power required to achieve a high lift coefficient for a given vehicle exceeds the power required for a given approach angle (or level flight in the limit), then it is not useful for landing.  This effect may be offset by adding drag (spoilers, windmilling propellers) which would also have the beneficial effect of increasing approach angle; this is key vehicle-level trade study.  Based on the drag polars given in ~\cite{Deere}, an X-57 like aircraft would be limited to a $CL_{max}$ of 3.5 on approach without a high-drag system; for the purposes of this paper that is used as the baseline approach $CL_{max}$, and 4.5 is used for the advanced case.  
+From this figure it should be noted that high power settings are required to achieve large $CL_{max}$, especially in the landing configuration.  As discussed by Patterson~\cite{Patterson2017}, this may limit the extent to which blown lift can be utilized during the approach phase of flight.  If the power required to achieve a high lift coefficient for a given vehicle exceeds the power required for a given approach angle (or level flight in the limit), then it is not useful for landing.  This effect may be offset by adding drag (spoilers, windmilling propellers) which would also have the beneficial effect of increasing approach angle; this is a key vehicle-level trade study.  Based on the drag polars given in ~\cite{Deere}, an X-57 like aircraft would be limited to a $CL_{max}$ of 3.5 on approach without a high-drag system; for the purposes of this paper that is used as the conservative approach $CL_{max}$, and 4.5 is used for the agressive case.  
 
 \paragraph{High Power Electric Motors}
 Apart from their role as an enabling component of DEP, electric motors have two other useful capabilities for electric aircraft.  The first is the ability to be operated at power settings significantly higher than maximum continuous power for short periods of time.  Since high power is most important for a short time at takeoff, this effect could significantly minimize the weight penalty of a high-power propulsion system~\cite{Moore_Mis}. Additionally, the rotation direction of these motors can be electrically reversed.  This is useful on braking to provide reverse thrust/massive drag at touchdown, which shortens landing distance without the weight penalty of dedicated thrust reversal systems.  
 
 \paragraph{Advanced Flight Controls}
-Autoland systems, which allow highly repeatable and precise landings, have become ubiquitous on commercial aircraft and have been proposed for emergency use in GA aircraft as well ~\cite{Siegel2012}.  In this context, a highly accurate autoland or landing guidance system could be used to reduce the margin of safety between the vehicle actual landing distance and required runway length.  Additionally, research is being done into autonomous post-stall landing maneuvers for fixed-wing micro air vehicles (MAVs) ~\cite{Moore_Perch} which could enable dynamic landing maneuvers near the vehicle stall speed.  Neither of these technologies are considered for the baseline technology variant, but are included in the advanced technology package.  All these technologies are summarized in Table ~\ref{t:tech}. 
+Autoland systems, which allow highly repeatable and precise landings, have become ubiquitous on commercial aircraft and have been proposed for emergency use in GA aircraft as well ~\cite{Siegel2012}.  In this context, a highly accurate autoland or landing guidance system could be used to reduce the margin of safety between the vehicle actual landing distance and required runway length.  Additionally, research is being done into autonomous post-stall landing maneuvers for fixed-wing micro air vehicles (MAVs) ~\cite{Moore_Perch} which could enable dynamic landing maneuvers near the vehicle stall speed.  Neither of these technologies are considered for the conservative technology variant, but are included in the aggressive technology package.  All these technologies are summarized in Table ~\ref{t:tech}. 
 
 % Table generated by Excel2LaTeX from sheet 'Sheet1'
 \begin{table}[htbp]
@@ -322,7 +321,7 @@ Autoland systems, which allow highly repeatable and precise landings, have becom
           & \multicolumn{1}{p{14.915em}}{Clmax Land: 3.5} & \multicolumn{1}{p{14.5em}}{Clmax Land: 4.5} \\
     \multicolumn{1}{l}{\multirow{2}[0]{*}{Electric Motor}} & \multicolumn{1}{p{14.915em}}{No additional power at takeoff} & \multicolumn{1}{p{14.5em}}{20\% additional power at takeoff} \\
           &       & \multicolumn{1}{p{14.5em}}{Reverse thrust on landing} \\
-    \multicolumn{1}{p{8.415em}}{Advanced flight controls} & \multicolumn{1}{p{14.915em}}{Current required margins on stall speed and runway margin} & \multicolumn{1}{p{14.5em}}{Reduction in required margins on speed ($V_{TD} = 1.1 V_{stall}$ ) and runway ($S_{runway} = 1.2*$max($S_{land}, S_{takeoff}$)} \\
+    \multicolumn{1}{p{8.415em}}{Advanced flight controls} & \multicolumn{1}{p{14.915em}}{Current required margins on touchdown speed and runway length} & \multicolumn{1}{p{14.5em}}{Reduced margins on touchdown speed and runway length} \\
     \midrule
           &       &  \\
     \end{tabular}%
@@ -332,18 +331,18 @@ Autoland systems, which allow highly repeatable and precise landings, have becom
 
 \section{Vehicle Feasibility}
 
-A sizing study using Geometric Programming optimization was performed to understand how vehicle performance and design would be effected by short take offs and landings. 
+A sizing study using geometric programming (GP) optimization was performed to understand how short takeoff and landing requirements affect vehicle performance and design. 
 This section describes the assumptions and equations used in the optimization model for vehicle size, cruise performance, and takeoff and landing distances.
 
 Geometric programming was selected as a means of evaluating this trade space because of its speed and reliability.  
-Geometric programming is a special type of convex, non-linear optimzation.\cite{gp}
-Because it is convex, even GPs with thousands of variables can be solved quickly.\cite{gp}
-Additionally, recent research has shown that GPs can be used to evaulate aircraft design trade spaces.\cite{burton_solar_2017}\cite{gpkit}
+Geometric programming is a special type of convex, non-linear optimzation\cite{gp}.
+Because it is convex, even GPs with thousands of variables can be solved quickly\cite{gp}.
+Additionally, recent research has shown that GPs can be used to effectively evaulate aircraft design trade spaces\cite{burton_solar_2017}\cite{gpkit}.
 
 
 \subsection{Vehicle Model}
 
-It is assumed that the aircraft is completely electric, replying on battery power for powered flight. 
+It is assumed that the aircraft is completely electric, relying only on battery power for powered flight. 
 The aircraft weight is comprised of the battery, payload, wing, motor, and structural weight,
 
 \begin{equation}
@@ -354,11 +353,11 @@ where the motor, passenger, and structural weights are
 
 \begin{align}
     W_{\mathrm{motor}} &\geq \frac{P_{\mathrm{shaft-max}}}{(P/W)_{\mathrm{motor}}} \\
-    W_{\mathrm{pax}} &= 195 \mathrm{[lbf]} \\
+    W_{\mathrm{pax}} &= 195\mathrm {  [lbf]}\\
     W_{\mathrm{struct}} &\geq W_{\mathrm{MTO}}f_{\mathrm{struct}}.
 \end{align}
 
-The battery weight is constrained by the range of the aircraft
+Passenger weight estimates are based on FAA guidance~\cite{AC120}. The battery weight is constrained by the range of the aircraft
 
 \begin{equation}
     R \leq \frac{h_{\mathrm{batt}} W_{\mathrm{batt}} \eta_{\mathrm{elec}} V}{gP_{\mathrm{shaft}}}
@@ -374,11 +373,11 @@ The aircraft is assumed to be in steady level flight during cruise.
 
 The wing weight is composed of the skin, main spar and additional components
 
-\begin{equation}
-    W_{\mathrm{wing}} \geq W_{\mathrm{skin}} + W_{\mathrm{spar}} + W_{\mathrm{fadd}}
-\end{equation}
-
-The skin and structural elements are assumed to be carbon fiber.  
+\begin{align}
+    W_{\mathrm{wing}} &\geq W_{\mathrm{skin}} + W_{\mathrm{spar}} + W_{\mathrm{fadd}} \\
+    W_{\mathrm{fadd}} &\geq 1.3W_{\mathrm{wing}} 
+\end{align}
+Where $fadd$ accounts for the required weight of flaps, slats, and additional structural components. The skin and structural elements are assumed to be carbon fiber.  
 The wing spar configuration is a cap spar with unidirectional carbon fiber caps wrapped in a shear web as shown in Figure~\ref{f:capspar}.  
 
 \begin{figure}[h!]
@@ -406,57 +405,48 @@ A simple drag model is used for the aircraft,
 \end{equation}
 
 where the profile drag coefficient $c_{d_p}(C_L, Re)$, is calculated from a representative wing polar. 
-The combined drag and wing loading models allow the aspect ratio to be optimized, trading structural integrity with aerodynamic performance. 
+The combined drag and wing loading models allow the aspect ratio to be optimized, trading structural weight with aerodynamic performance. 
 
 \subsection{Takeoff and Landing Models}
-
 The takeoff model was adapted from Raymer's takeoff equations to fit a GP compatible form.  Using equations of motion the takeoff state can be expressed
 
 \begin{equation}
     T - D - \mu(W_{\mathrm{MTO}} - L) = \frac{W_{\mathrm{MTO}}}{g} \frac{dV}{dt}.
 \end{equation}
-
 This can be simplified to 
 \begin{align}
     \frac{dV}{dt} &= g \left( \frac{T}{W_{\mathrm{MTO}}} - \mu \right) - \frac{g}{W_{\mathrm{MTO}}} \left( \frac{1}{2} \rho S V^2 (C_{D_g} - \mu C_{L_g})\right) \\
     \label{e:todiff}
     \frac{dt}{dV} &= \frac{1}{A-BV^2}
 \end{align}
-
 The takeoff ground run distance can then be expressed by taking the integral of Equation~\ref{e:todiff} to achieve
 
 \begin{equation}
     \label{e:to}
     S_{\mathrm{TO}} = \frac{1}{2B} \ln{\frac{A}{A-BV^2}} 
 \end{equation}
-
 The natural log function can be approximated to make Equation~\ref{e:to} GP-comptible by 
 
 \begin{equation}
     \ln{\frac{A}{A-BV^2}} \approx \num{5.6e-4} A^{-6.04} (BV^2)^{6.04} + 1.0 A^{-0.001} (BV^2)^{0.001} + \num{7.5e-4} A^{-1.276} (BV^2)^{1.275}
 \end{equation}
-
 with an average log error of 0.06\%.  The terms $A$, and $B$, are constrained by
 
 \begin{align}
     \frac{T}{W_{\mathrm{MTO}}} &\geq \frac{A}{g} + \mu \\
     B &\geq \frac{g}{W_{\mathrm{MTO}}} \frac{1}{2} \rho S C_{D_g}
 \end{align}
-
-where the $\mu C_{L_g}$ term is neglected as a conservative approximation for $B$ to preserve GP-compatibility. 
-
-The landing ground roll distance is calculated using conservation of energy, with the primary design variable being the loading deceleration factor, $N$.
-This constraint will drive the wing loading down. 
+where the $\mu C_{L_g}$ term is neglected as a conservative approximation for $B$ to preserve GP-compatibility. The landing ground roll distance is calculated using conservation of energy, 
 
 \begin{equation}
     \label{e:sgr}
     S_{\mathrm{land}} \geq \frac{1}{2} \frac{V^2}{Ng} 
 \end{equation}
+where $N$ is the deceleration factor ($N=1$ corresponds to a 1-g deceleration). 
 
-where $N=1$ corresponds to a 1-g deceleration. 
-The deceleration factor is a function of the technologies used to stop the aircraft and include, but are not limited to: brakes, reverse thrust from electric motors, and drag.  This was used instead of a more conventional braking model because, as discussed subsequently, these vehicles are driven primarily by landing constraints.  This creates an incentive to use some type of thrust reversal or dedicated braking thrust system to shorten the landing distance.  The details of this system are an important vehicle level design trade; the landing deceleration used in this system-level study becomes the design requirement for a future vehicle design effort. Passenger tolerance for negative deceleration may limit how high this target can be increased, but that requires future study.  
-To understand how the g-loading constant varies with different amounts of reverse thrust, the ground roll and deceleration factor are calculate for the X-57 as an example case. 
-Table~\ref{t:landingdecel} shows the deceleration loading factor for different amounts of reverse thrust. 
+The deceleration factor is a function of the technologies used to stop the aircraft and include, but are not limited to: brakes, reverse thrust from electric motors, and drag.  This was used instead of a more conventional braking model because, as discussed subsequently, these vehicles are driven primarily by landing constraints.  This creates an incentive to use some type of thrust reversal or dedicated braking thrust system to shorten the landing distance.  The details of this system are an important vehicle level design trade; the landing deceleration used in this system-level study becomes the design requirement for a future vehicle design effort. Passenger comfort and system weight are additional considerations.  
+To understand how the g-loading constant varies with different amounts of reverse thrust, the ground roll and deceleration factor are calculated for the X-57 as an example case. 
+Table~\ref{t:landingdecel} shows the deceleration factor for different amounts of reverse thrust. 
 
 \begin{table}[H]
     \centering
@@ -475,10 +465,10 @@ Table~\ref{t:landingdecel} shows the deceleration loading factor for different a
 \end{tabular}
 \end{table}
 
-For both the landing and takeoff constraints it is assumed that the velocity has a 30\% margin above the stall velocity,
+For both the landing and takeoff constraints it is assumed that the velocity has a 30\% margin above the stall velocity\cite{ASTM3179}.
 For the purposes of this study, deceleration corresponding to braking with a small amount of reverse thrust (.4g) was used for the conservative case, while a more powerful thrust reversal system (.7g) was used for the aggressive case. 
 It is assumed that the the max lift coefficient is different for landing and takeoff.
-Another 40\% margin is placed on the ground roll distance to determine runway length.  For this vehicle, balanced field length considerations were not considered as the loss of a single engine is only a small reduction in total thrust.  Additionally, takeoff distance over a 35ft obstacle was not considered since the focus is on determining the amount of physical infrastructure required.  Where appropriate (such as when the runway is located at ground level) the appropriate 35ft obstacle clearance will be added.  
+A 40\% margin is placed on the ground roll distance to determine runway length\cite{PilotGuide}.  For this vehicle, balanced field length considerations were not considered as the loss of a single engine is only a small reduction in total thrust.  Because the majority of sites being considered are elevated, takeoff or landing distance over a 35ft obstacle was not included in the model.  It will be evaluated on a case by case basis for different runway locations.
 
 \begin{align}
     S_{\mathrm{runway}} &\geq 1.4S_{\mathrm{TO}} \\
@@ -487,9 +477,9 @@ Another 40\% margin is placed on the ground roll distance to determine runway le
 
 \subsection{Vehicle Trade Studies}
 
-Using the geometric programming model of a STOL aircraft perviously described, tradeoffs between runway length and vehicle performance were evaulated.  The models consists of a 105 free variables and can be solved in approximately 0.1 seconds. 
-Because aircraft scales with aircraft weight as a first order approximation, the objective function throughout is to minimize weight, $\min{(W_{\mathrm{MTO}})}$. 
-Key parameters are defined in Table~\ref{t:params}.
+Using the geometric programming model of a STOL aircraft perviously described, tradeoffs between runway length and vehicle performance were evaulated.  The models consists of 105 free variables and can be solved in approximately 0.1 seconds. 
+Because aircraft cost scales with aircraft weight as a first order approximation, the objective function throughout is to minimize weight, $\min{(W_{\mathrm{MTO}})}$. 
+Key parameter values are defined in Table~\ref{t:params}.
 
 \begin{table}[H]
     \centering
@@ -499,10 +489,9 @@ Key parameters are defined in Table~\ref{t:params}.
     \toprule
     \toprule
     Parameter                                   & Value         \\ \hline
-    $S_{\mathrm{runway}}$                       & 300 [ft]      \\
     $\eta_{\mathrm{elec}}$                      & 0.9           \\
     $h_{\mathrm{batt}}$                         & 210 [Whr/kg]  \\
-    $P_{\mathrm{spec}}$                         & 0.7136 [kW/N] \\
+    $(P/W)_{\mathrm{motor}}$                         & 7.0 [kW/kg] \\
     $R$                                         & 100 [nmi]     \\
     $V_{\mathrm{min}}$                          & 100 [kts]     \\
     $C_{L_{\mathrm{max}}}$ (Landing)            & 3.5           \\
@@ -514,14 +503,14 @@ Key parameters are defined in Table~\ref{t:params}.
 \end{table}
 
 To understand how passenger and runway requirements affect vehicle weight, the GP model was solved 30 times in 3.46 seconds.  
-The results are shown in Figure~\ref{f:sw_mtow}, each point on the graph corresponding to a unique optimization solution or vehicle size.  
-From this study it is observed that for runway lengths shorter than 250 ft are near infeasible for this set of parameters.  
-It is also oberserved that the runway length is fairly insenstive to number of passengers.  
+The results are shown in Figure~\ref{f:sw_mtow}, each point on the graph corresponding to a unique optimization solution for vehicle size.  
+From this study it is observed that runway lengths shorter than 250 ft are nearly infeasible for this set of parameters.  
+It is also observed that the runway length is fairly insensitive to number of passengers.  
 
 \begin{figure}[h!]
  \begin{subfigmatrix}{2}% number of columns
      \subfigure[\label{f:sw_mtow}Contours of number of passengers]{\includegraphics[]{sw_mtow.pdf}}
-     \subfigure[\label{f:sw_mtowsens}Sensitivity to landing constraints]{\includegraphics[]{sw_mtowsens.pdf}}
+     \subfigure[\label{f:sw_mtowsens}Sensitivity to landing and takeoff constraints]{\includegraphics[]{sw_mtowsens.pdf}}
  \end{subfigmatrix}
     \caption{\textbf{Trade space of aircraft weight, number of passengers and runway length.}}
  \label{f:sw_mt}
@@ -530,7 +519,7 @@ It is also oberserved that the runway length is fairly insenstive to number of p
 To effectively shorten the field length it is important to know whether the vehicle size is driven by the landing or takeoff constraints. 
 Qualitatively, the landing model has a direct effect on wing loading as shown in Equations~\ref{e:sgr} and~\ref{e:stall}.  
 The takeoff model primarily effects the thrust to weight ratio but also has a small effect on the wing loading (Equation~\ref{e:to}). 
-The effect of the thrust to weight ratio ($(T/W)$) and the wing loading ($(W/S)$) is shown in figure~\ref{f:to_land_arg}
+The effect of the thrust to weight ratio $(T/W)$ and the wing loading $(W/S)$ is shown in figure~\ref{f:to_land_arg}.
 The thrust to weight ratio drives the motor weight.  
 The wing loading drives the wing size, which in turn drives the wing weight, drag and ultimately battery weight.  
 This argument implies that the landing model would constrain the vehicle size. 
@@ -543,24 +532,23 @@ This argument implies that the landing model would constrain the vehicle size.
 	\end{center}
 \end{figure}
 
-This hypothesis, that vehicle size is more constrained by landing than takeoff, can be confirmed by looking at the sensitivity to both the landing and takeoff models. 
+The hypothesis that vehicle size is more constrained by landing is confirmed by looking at the sensitivity to both the landing and takeoff models. 
 The sensitivity to a variable in a geometric program is defined as the percentage change in the objective function for a 1\% change in that variable's value.  
-Therefore, if the sensitivity to the landing constraints is greater in magnitude than the sensitivity to the take off constraints then the system is landing constrained.  
-In figure~\ref{f:sw_mtowsens} the magnitude of sensitivity to the landing constraints is greater than the sensitivity to the takeoff constraints confirming that the aircraft is landing length driven. 
+Therefore, if the sensitivity to the landing constraints is greater in magnitude than the sensitivity to the take off constraints, the system is landing constrained.  
+Figure~\ref{f:sw_mtowsens} shows this is the case for these aircraft.
 The sensitivity to the takeoff constraints is not zero because the takeoff model requires a thrust to weight ratio which determines the motor weight. 
 
 
 \subsection{Requirement Trade Studies}
 
-Because of the low wing loading required by the takeoff and landing models, the the optimum cruise speed of a STOL vehicle tends to be fairly slow.
-Therefore, a minimum cruise speed requirement is imposed in the model
+Because of the low wing loading required by the takeoff and landing models, the optimum cruise speed of STOL vehicles are fairly slow.
+Therefore, a minimum cruise speed requirement is imposed in the model,
 
 \begin{equation}
     V_{\mathrm{cruise}} \geq V_{\mathrm{min}}.
 \end{equation}
 
-The minimum speed requirement affects the amount of power draw and consequently the amount of batteries needed.  
-This affects the ability to reach higher ranges and also increases the wing loading requiring longer runways.  
+The minimum speed requirement affects the cruise power requirement and consequently the amount of batteries needed.  
 One way to achieve higher range or shorter runways is to decrease the required minimum speed during cruise.  
 Conversely, flying faster requires shorter ranges or longer runways.
 This trade off is shown in Figure~\ref{f:minspeed}.
@@ -568,8 +556,8 @@ The flat portion of the curves indicates that the aircraft is not constrained by
 
 \begin{figure}[h!]
  \begin{subfigmatrix}{2}% number of columns
-     \subfigure[\label{f:vweightR}Contours of range]{\includegraphics[]{vweightR.pdf}}
-     \subfigure[\label{f:vweightS}Contours of runway length]{\includegraphics[]{vweightS.pdf}}
+     \subfigure[\label{f:vweightR}Contours of range$\mathrm{[nmi]}$]{\includegraphics[]{vweightR.pdf}}
+     \subfigure[\label{f:vweightS}Contours of runway length$\mathrm{[ft]}$]{\includegraphics[]{vweightS.pdf}}
  \end{subfigmatrix}
  \caption{\textbf{Trade study between requirements of runway length, minimum speed and range.}}
  \label{f:minspeed}
@@ -580,8 +568,8 @@ The flat portion of the curves indicates that the aircraft is not constrained by
 The previous section showed fundamental trade studies and trends for how runway length varies with performance.  
 It is also possible to shorten runway length through advanced technology. 
 As discussed previously, a number of technologies could help reduce the required runway length including power bursts from electric motors, reverse thrust on landing, advanced flight controls, and improved battery technology.  
-The effect of these technology advances on required runway length can be observed by changing a few parameters from the baseline case and resolving the optimization model.
-Table~\ref{t:techparams} compares the conservative parameters to the aggressive technology parameters that were assumed in the optimization model based off of the technologies discuessed in Table~\ref{t:techtable}. 
+The effect of these technology advances on required runway length can be observed by changing a few parameters from the baseline conservative case and re-solving the optimization model.
+Table~\ref{t:techparams} compares the conservative parameters to the aggressive technology parameters that were assumed in the optimization model based off of the technologies discussed in Table~\ref{t:tech}. 
 
 \begin{table}[H]
     \centering
@@ -592,7 +580,7 @@ Table~\ref{t:techparams} compares the conservative parameters to the aggressive 
     \toprule
     Technology                  & Parameter                         & Conservative Value  & Aggressive Value \\ \hline
     Battery improvements        & $h_{\mathrm{batt}}$               & 210 [Whr/kg]        & 300 [Whr/kg]\cite{batterytrend}\cite{seeo}     \\
-    Motor power burst           & $(P/W)_{\mathrm{motor}}$          & 0.7136 [kW/N]       & 0.571 [kW/N]     \\
+    Motor power burst           & $(P/W)_{\mathrm{motor}}$          & 7.0 [kW/kg]       & 8.4 [kW/kg]     \\
     Blown wing                  & $C_{L_{\mathrm{max}}}$ (Landing)  & 3.5                 & 4.5              \\
     Blown wing                  & $C_{L_{\mathrm{max}}}$ (TO)       & 4.0                 & 5.0              \\
     Reverse thrust              & Decleration Factor                & 0.4                 & 0.7              \\
