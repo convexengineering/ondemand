@@ -4,6 +4,7 @@ import pandas as pd
 from numpy import pi
 from gpkit import Variable, Model, SignomialsEnabled, units, parse_variables
 from gpkitmodels.GP.aircraft.wing.wing import Wing
+from gpkitmodels.GP.aircraft.wing.wing_test import FlightState
 from gpfit.fit_constraintset import FitCS
 from flightstate import FlightState
 from landing import Landing
@@ -45,12 +46,13 @@ class Aircraft(Model):
         Wing.fillModel = None
         self.wing = Wing()
 
-        loading = self.wing.spar.loading(self.wing)
+        loading = self.wing.spar.loading(self.wing, FlightState())
         loading.substitutions.update({loading.kappa: 0.05,
                                       self.wing.spar.material.sigma: 1.5e9,
                                       loading.Nmax: 6,
                                       self.wing.planform.lam: 0.7,
                                       self.wing.skin.material.tmin: 0.012*4,
+                                      self.wing.planform.tau: 0.115,
                                       self.wing.mfac: 1.4,
                                       self.wing.spar.mfac: 0.8})
 
